@@ -2,8 +2,6 @@
 
 interface SolrSource {
 	
-	public static function create($strName);
-	
 	public function getName();
 	
 	public function getDisplayName();
