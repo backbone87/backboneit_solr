@@ -13,4 +13,7 @@ class ModuleSolr extends BackendModule {
 		$this->redirect($this->getReferer());
 	}
 	
+	protected function compile() {
+	}
+	
 }
