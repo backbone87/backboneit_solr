@@ -48,8 +48,6 @@ final class SolrDefaultIndex extends SolrAbstractIndex {
 		}
 		
 		$this->arrSources = array();
-		var_dump($arrConfig);
-		var_dump($arrConfig['sources']);
 		foreach($arrConfig['sources'] as $arrSource) {
 			$this->arrSources[$arrSource['name']] = $arrSource;
 		}
