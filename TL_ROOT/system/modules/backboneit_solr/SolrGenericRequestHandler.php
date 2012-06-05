@@ -10,7 +10,7 @@ class SolrGenericRequestHandler implements SolrRequestHandler {
 	
 	protected $objQueryClass;
 	
-	protected function __construct($strName, $strType, SolrIndex $objIndex, $strQueryClass) {
+	public function __construct($strName, $strType, SolrIndex $objIndex, $strQueryClass) {
 		$objQueryClass = new ReflectionClass($strQueryClass);
 		if(!$objQueryClass->isSubclassOf('SolrQuery')) {
 			throw new Exception(sprintf('Query class [%s] is not of type SolrQuery', $strQueryClass));
