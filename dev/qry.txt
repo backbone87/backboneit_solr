@@ -1,0 +1,8 @@
+
+// 		$objDB->prepare('
+// 			SELECT	s.*, p.pageTitle, p.language
+// 			FROM	tl_bbit_solr_page AS s
+// 			JOIN	tl_page AS p ON p.id = s.page
+// 			WHERE	p.id IN (' . implode(',', $arrPages) . ')
+// 			AND		p.type = ?
+// 		')->execute('regular');
