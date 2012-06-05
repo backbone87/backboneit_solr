@@ -1,7 +1,7 @@
 <?php
 
 $GLOBALS['BE_MOD']['system']['bbit_solr_index'] = array('callback' => 'ModuleSolr'); 
-$GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('SolrContaoPageSearchSourceManager', 'hookOutputFrontendTemplate');
+$GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('SolrContaoPageSourceManager', 'hookOutputFrontendTemplate');
 $GLOBALS['TL_CRON']['daily'][] = array('SolrIndexManager', 'runUpdates');
 
 // $GLOBALS['BBIT_SOLR_HOOKS']['beforeRunUpdates'] = array('', '');
@@ -14,25 +14,25 @@ $GLOBALS['SOLR_DEFAULT_INDEX'] = array(
 	'url' => 'http://localhost:8080/solr',
 	'core' => '/contao',
 	'handlers' => array(
-		array(
-			'name'		=> '/update/json',
-			'type'		=> 'solr.JsonUpdateRequestHandler',
-			'query'		=> 'SolrUpdateQuery'
-		),
-		array(
-			'name'		=> '/update/extract',
-			'type'		=> 'solr.ExtractingRequestHandler',
-			'query'		=> 'SolrExtractingUpdateQuery'
-		),
-		array(
-			'name'		=> '/select',
-			'type'		=> 'solr.SearchHandler',
-			'query'		=> 'SolrSearchQuery'
-		),
+// 		array(
+// 			'name'		=> '/update/json',
+// 			'type'		=> 'solr.JsonUpdateRequestHandler',
+// 			'query'		=> 'SolrUpdateQuery',
+// 		),
+// 		array(
+// 			'name'		=> '/update/extract',
+// 			'type'		=> 'solr.ExtractingRequestHandler',
+// 			'query'		=> 'SolrExtractingUpdateQuery',
+// 		),
+// 		array(
+// 			'name'		=> '/select',
+// 			'type'		=> 'solr.SearchHandler',
+// 			'query'		=> 'SolrSearchQuery',
+// 		),
 		array(
 			'name'		=> '/cto2solr',
 			'type'		=> 'solr.handler.dataimport.DataImportHandler',
-			'query'		=> 'SolrDIHQuery'
+			'query'		=> 'SolrDIHQuery',
 		),
 	),
 	'sources' => array(
@@ -41,7 +41,7 @@ $GLOBALS['SOLR_DEFAULT_INDEX'] = array(
 );
 
 $GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES']['bbit_solr_page'] = array(
-	'class' => 'SolrContaoPageSearchSource',
+	'class' => 'SolrContaoPageSource',
 	'config' => array(
 		array('setRoots', 0),
 		array('setExtractImages', true),
@@ -51,4 +51,4 @@ $GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES']['bbit_solr_page'] = array(
 // add all factories for indexes and search sources to their respective managers
 // the managers are aggregation factories
 SolrIndexManager::getInstance()->add(SolrDefaultIndexFactory::getInstance());
-SolrSearchSourceManager::getInstance()->add(SolrDefaultSearchSourceFactory::getInstance());
+SolrSourceManager::getInstance()->add(SolrDefaultSourceFactory::getInstance());

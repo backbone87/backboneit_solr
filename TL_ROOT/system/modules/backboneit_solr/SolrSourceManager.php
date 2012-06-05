@@ -1,6 +1,6 @@
 <?php
 
-final class SolrSearchSourceManager extends SolrAbstractSearchSourceFactory {
+final class SolrSourceManager extends SolrAbstractSourceFactory {
 	
 	public static function findSource($strName) {
 		return self::getInstance()->getSource($strName);
@@ -8,11 +8,11 @@ final class SolrSearchSourceManager extends SolrAbstractSearchSourceFactory {
 	
 	protected $arrFactories = array();
 	
-	public function add(SolrSearchSourceFactory $objFactory) {
+	public function add(SolrSourceFactory $objFactory) {
 		$this->arrFactories[spl_object_hash($objFactory)] = $objFactory;
 	}
 	
-	public function remove(SolrSearchSourceFactory $objFactory) {
+	public function remove(SolrSourceFactory $objFactory) {
 		unset($this->arrFactories[spl_object_hash($objFactory)]);
 	}
 	

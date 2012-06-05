@@ -1,6 +1,6 @@
 <?php
 
-abstract class SolrAbstractSearchSource implements SolrSearchSource {
+abstract class SolrAbstractSource implements SolrSource {
 	
 	private $strName;
 	

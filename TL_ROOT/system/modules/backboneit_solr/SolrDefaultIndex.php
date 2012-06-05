@@ -24,11 +24,11 @@ final class SolrDefaultIndex extends SolrAbstractIndex {
 		return $this->arrHandlers;
 	}
 	
-	public function getSearchSourceNames() {
+	public function getSourceNames() {
 		return array_keys($this->arrSources);
 	}
 	
-	protected function runUpdateFor(SolrSearchSource $objSource) {
+	protected function runUpdateFor(SolrSource $objSource) {
 		$objSource->index($this, $this->getRequestHandler($this->arrSources[$objSource->getName()]['handler']));
 	}
 	
@@ -48,6 +48,8 @@ final class SolrDefaultIndex extends SolrAbstractIndex {
 		}
 		
 		$this->arrSources = array();
+		var_dump($arrConfig);
+		var_dump($arrConfig['sources']);
 		foreach($arrConfig['sources'] as $arrSource) {
 			$this->arrSources[$arrSource['name']] = $arrSource;
 		}

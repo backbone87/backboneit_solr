@@ -1,6 +1,6 @@
 <?php
 
-final class SolrDefaultSearchSourceFactory extends SolrAbstractSearchSourceFactory {
+final class SolrDefaultSourceFactory extends SolrAbstractSourceFactory {
 	
 	
 	protected $arrSources = array();
@@ -28,7 +28,7 @@ final class SolrDefaultSearchSourceFactory extends SolrAbstractSearchSourceFacto
 		
 		try {
 			$objClass = new ReflectionClass($arrSource['class']);
-			if(!$objClass->isSubclassOf('SolrSearchSource')) {
+			if(!$objClass->isSubclassOf('SolrSource')) {
 				return null;
 			}
 			
@@ -55,7 +55,7 @@ final class SolrDefaultSearchSourceFactory extends SolrAbstractSearchSourceFacto
 		$this->arrSources = array();
 	}
 	
-	protected function configSource(ReflectionClass $objClass, SolrSearchSource $objSource, array $arrConfig) {
+	protected function configSource(ReflectionClass $objClass, SolrSource $objSource, array $arrConfig) {
 		foreach($arrConfig as $arrCall) {
 			$objMethod = $objClass->getMethod($arrCall[0]);
 			if(!$objMethod->isPublic()) {

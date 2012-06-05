@@ -1,6 +1,6 @@
 <?php
 
-final class SolrContaoPageSearchSourceManager extends Controller {
+final class SolrContaoPageSourceManager extends Controller {
 	
 	private static $objInstance;
 	

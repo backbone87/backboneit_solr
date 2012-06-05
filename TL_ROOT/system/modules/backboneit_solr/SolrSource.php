@@ -1,6 +1,6 @@
 <?php
 
-interface SolrSearchSource {
+interface SolrSource {
 	
 	public static function create($strName);
 	

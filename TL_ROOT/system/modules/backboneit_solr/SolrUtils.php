@@ -20,9 +20,9 @@ final class SolrUtils extends Backend {
 		return $arrOptions;
 	}
 	
-	public function getSearchSourcesAsOptions() {
+	public function getSourcesAsOptions() {
 		$arrOptions = array();
-		foreach(SolrSearchSourceManager::getInstance() as $strName => $objSource) {
+		foreach(SolrSourceManager::getInstance() as $strName => $objSource) {
 			$arrOptions[$strName] = $objSource->getDisplayName();
 		}
 		return $arrOptions;
@@ -68,15 +68,15 @@ final class SolrUtils extends Backend {
 		return parent::getChildRecords($arrParentIds, $strTable, $blnSorting, $arrReturn);
 	}
 	
-	public function loadLanguageFile($strName) {
+	public function loadLanguageFile($strName, $strLanguage = false, $blnNoCache = false) {
 		return parent::loadLanguageFile($strName);
 	}
 	
-	private function __construct() {
+	protected function __construct() {
 		parent::__construct();
 	}
 	
-	private function __clone() {
+	protected function __clone() {
 	}
 	
 	private static $objInstance;

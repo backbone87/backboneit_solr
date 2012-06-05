@@ -1,6 +1,6 @@
 <?php
 
-interface SolrSearchSourceFactory extends IteratorAggregate {
+interface SolrSourceFactory extends IteratorAggregate {
 	
 	public function getSourceNames();
 	

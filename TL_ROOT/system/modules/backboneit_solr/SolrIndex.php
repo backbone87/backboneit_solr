@@ -16,7 +16,7 @@ interface SolrIndex {
 	
 	public function getRequestHandlersByQueryClass($varQueryClass);
 	
-	public function getSearchSources();
+	public function getSources();
 	
 	public function update($blnScheduled = true);
 	

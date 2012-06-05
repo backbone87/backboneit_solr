@@ -53,33 +53,38 @@ abstract class SolrAbstractIndex implements SolrIndex {
 		return $arrHandlers;
 	}
 	
-	public function getSearchSources() {
-		$objMgr = SolrSearchSourceManager::getInstance();
+	public function getSources() {
+		$objMgr = SolrSourceManager::getInstance();
 		$arrSources = array();
-		foreach($this->getSearchSourceNames() as $strName) {
-			$objSource = $objMgr->getSearchSource($strName);
+		foreach($this->getSourceNames() as $strName) {
+			$objSource = $objMgr->getSource($strName);
 			$objSource !== null && $arrSources[$objSource->getName()] = $objSource;
 		}
 		return $arrSources;
 	}
 	
 	public final function update($blnScheduled = true) {
-		foreach($this->getSearchSources() as $objSource) {
+		var_dump($this->getName(), 'update');
+		var_dump($this->getSourceNames());
+		foreach($this->getSources() as $objSource) {
 			if(!$blnScheduled || $this->isUpdateScheduledFor($objSource)) {
 				SolrUtils::getInstance()->executeCallbacks('beforeUpdate', $this, $objSource);
+				
+				var_dump($this->getName(), 'runUpdateFor', $objSource->getName());
+				exit;
 				$this->runUpdateFor($objSource);
 				SolrUtils::getInstance()->executeCallbacks('afterUpdate', $this, $objSource);
 			}
 		}
 	}
 	
-	abstract public function getSearchSourceNames();
+	abstract public function getSourceNames();
 	
-	protected function isUpdateScheduledFor(SolrSearchSource $objSource) {
+	protected function isUpdateScheduledFor(SolrSource $objSource) {
 		return true;
 	}
 	
-	protected function runUpdateFor(SolrSearchSource $objSource) {
+	protected function runUpdateFor(SolrSource $objSource) {
 		$objSource->index($this);
 	}
 	

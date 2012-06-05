@@ -1,6 +1,6 @@
 <?php
 
-class SolrContaoPageSearchSource extends SolrAbstractSearchSource {
+class SolrContaoPageSource extends SolrAbstractSource {
 	
 	protected $arrRoots;
 	

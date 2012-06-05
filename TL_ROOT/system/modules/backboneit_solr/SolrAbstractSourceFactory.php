@@ -1,6 +1,6 @@
 <?php
 
-abstract class SolrAbstractSearchSourceFactory implements SolrSearchSourceFactory {
+abstract class SolrAbstractSourceFactory implements SolrSourceFactory {
 	
 	protected function __construct() {
 	}
