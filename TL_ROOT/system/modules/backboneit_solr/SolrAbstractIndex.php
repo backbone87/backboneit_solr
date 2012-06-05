@@ -15,7 +15,7 @@ abstract class SolrAbstractIndex implements SolrIndex {
 	public function getDisplayName() {
 		$strName = $this->getName();
 		SolrUtils::getInstance()->loadLanguageFile('bbit_solr');
-		$strDisplayName = $GLOBALS['TL_LANG']['SOLR_INDEXES'][$strName];
+		$strDisplayName = $GLOBALS['TL_LANG']['bbit_solr']['index'][$strName];
 		return $strDisplayName ? $strDisplayName : $strName;
 	}
 	

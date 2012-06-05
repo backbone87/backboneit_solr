@@ -15,7 +15,7 @@ abstract class SolrAbstractSearchSource implements SolrSearchSource {
 	public function getDisplayName() {
 		$strName = $this->getName();
 		SolrUtils::getInstance()->loadLanguageFile('bbit_solr');
-		$strDisplayName = $GLOBALS['TL_LANG']['SOLR_SOURCES'][$strName];
+		$strDisplayName = $GLOBALS['TL_LANG']['bbit_solr']['source'][$strName];
 		return $strDisplayName ? $strDisplayName : $strName;
 	}
 	
