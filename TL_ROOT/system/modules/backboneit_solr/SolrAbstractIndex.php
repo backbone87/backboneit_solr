@@ -8,6 +8,10 @@ abstract class SolrAbstractIndex implements SolrIndex {
 		$this->strName = $strName;
 	}
 	
+	abstract public function getSourceNames();
+	
+	abstract protected function runUpdateFor(SolrSource $objSource);
+	
 	public function getName() {
 		return $this->strName;
 	}
@@ -64,8 +68,6 @@ abstract class SolrAbstractIndex implements SolrIndex {
 	}
 	
 	public final function update($blnScheduled = true) {
-		var_dump($this->getName(), 'update');
-		var_dump($this->getSourceNames());
 		foreach($this->getSources() as $objSource) {
 			if(!$blnScheduled || $this->isUpdateScheduledFor($objSource)) {
 				SolrUtils::getInstance()->executeCallbacks('beforeUpdate', $this, $objSource);
@@ -78,14 +80,8 @@ abstract class SolrAbstractIndex implements SolrIndex {
 		}
 	}
 	
-	abstract public function getSourceNames();
-	
 	protected function isUpdateScheduledFor(SolrSource $objSource) {
 		return true;
-	}
-	
-	protected function runUpdateFor(SolrSource $objSource) {
-		$objSource->index($this);
 	}
 	
 }
