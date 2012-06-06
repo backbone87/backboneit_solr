@@ -3,16 +3,16 @@
 final class SolrUtils extends Backend {
 	
 	public static function unnestStringsAsSet(&$arrCollection, $arrArgs) {
-		foreach($arrCollection as $varString) {
+		foreach($arrArgs as $varString) {
 			if(is_string($varString)) {
-				$arrTypes[$varString] = true;
+				$arrCollection[$varString] = true;
 			} elseif(is_array($varString)) {
 				self::collectStringArgs($arrCollection, $varString);
 			}
 		}
 	}
 	
-	public function getIndexesAsOptions() {
+	public function getIndexOptions() {
 		$arrOptions = array();
 		foreach(SolrIndexManager::getInstance() as $strName => $objIndex) {
 			$arrOptions[$strName] = $objIndex->getDisplayName();
@@ -20,12 +20,99 @@ final class SolrUtils extends Backend {
 		return $arrOptions;
 	}
 	
-	public function getSourcesAsOptions() {
+	public function getSourceOptions() {
 		$arrOptions = array();
 		foreach(SolrSourceManager::getInstance() as $strName => $objSource) {
 			$arrOptions[$strName] = $objSource->getDisplayName();
 		}
 		return $arrOptions;
+	}
+	
+	public function getSourceOptionByIndex($objDCA) {
+		$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
+		$arrSources = array();
+		if($objIndex) foreach($objIndex->getSources() as $objSource) {
+			$arrSources[$objSource->getName()] = $objSource->getDisplayName();
+		}
+		return $arrSources;
+	}
+	
+	public function getDocumentTypeOptionsByIndex($objDCA) {
+		$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
+		$arrTypes = array();
+		if($objIndex) foreach($objIndex->getSources() as $objSource) {
+			foreach($objSource->getDocumentTypes() as $strDocType) {
+				$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
+				$arrTypes[$strDocType] = $strLabel ? $strLabel : $strDocType;
+			}
+		}
+		return $arrTypes;
+	}
+	
+	public function getTplOptions() {
+		$strClass = $GLOBALS['FE_MOD']['application'][$objDC->activeRecord->type];
+		
+		if(!$strClass) {
+			return array();
+		}
+		
+		try {
+			$objClass = new ReflectionClass($strClass);
+		} catch (LogicException $e) {
+			return array();
+		}
+		
+		$strDefault = $objClass->getConstant('DEFAULT_TEMPLATE');
+		 
+		if(!$strDefault) {
+			return array();
+		}
+		
+		return $this->getTemplateGroupExcludeDefault($strDefault);
+	}
+	
+	public function getDocTplOptions() {
+		return $this->getTemplateGroupExcludeDefault('bbit_solr_doc');
+	}
+	
+	protected function getTemplateGroupExcludeDefault($strDefault) {
+		$intPID = $this->Input->get('act') == 'overrideAll' ? $this->Input->get('id') : $objDC->activeRecord->pid;
+		$arrTpls = $this->getTemplateGroup($strDefault, $intPID);
+		
+		$intDefault = array_search($strDefault, $arrTpls);
+		if($intDefault !== false) {
+			unset($arrTpls[$intDefault]);
+			$arrTpls = array_values($arrTpls);
+		}
+		
+		return $arrTpls;
+	}
+	
+	public function getSearchModuleOptions($objDCA) {
+		$objResult = $this->Database->prepare(
+			'SELECT id, name FROM tl_module WHERE id != ? AND (type = ? OR type = ?)'
+		)->execute($objDCA->activeRecord->id, 'bbit_solr_search', 'bbit_solr_result');
+		
+		$arrModules = array('nocopy' => &$GLOBALS['TL_LANG']['MSC']['blankOptionLabel']);
+		while($objResult->next()) {
+			$arrModules[$objResult->id] = $objResult->name . ' (ID ' . $objResult->id . ')';
+		}
+		
+		return $arrModules;
+	}
+	
+	public function loadDocTpls($varValue, $objDCA) {
+		$arrRows = array();
+		
+		foreach($this->getDocumentTypeOptionsByIndex($objDCA) as $strDocType => $strLabel) {
+			$arrRows[$strDocType] = array('docType' => $strDocType);
+		}
+		
+		foreach(deserialize($varValue, true) as $arrRow) if(isset($arrRows[$arrRow['docType']])) {
+			$arrRows[$arrRow['docType']] = $arrRow;
+		}
+		
+		return $arrRows;
 	}
 	
 	public function executeCallbacks($varCallbacks) {
