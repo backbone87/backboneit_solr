@@ -1,6 +1,6 @@
 <?php
 
-class SolrJSONResult extends SolrResult {
+class SolrJSONResult implements SolrResult {
 	
 	protected $arrContent;
 	

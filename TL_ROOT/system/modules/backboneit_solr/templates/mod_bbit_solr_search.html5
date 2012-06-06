@@ -1,1 +1,28 @@
-<?php
+<!-- indexer::stop -->
+<section class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<?php if ($this->headline): ?>
+<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+<?php endif; ?>
+
+<form action="<?php echo $this->action; ?>" method="get">
+
+<input class="query" type="text" autocomplete="off"
+	id="<?php echo $this->queryID; ?>" name="<?php echo $this->queryName; ?>"
+	value="<?php echo $this->queryValue; ?>" />
+<input class="submit" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['search']; ?>" />
+
+</form>
+
+<?php if($this->result): ?>
+<div class="result"><pre>
+<?php echo print_r($this->result); ?>
+</pre></div>
+<?php endif; ?>
+
+<script>
+window.addEvent("domready", function() {
+});
+</script>
+
+</section>
+<!-- indexer::continue -->
