@@ -1,0 +1,113 @@
+<dataConfig>
+  <script><![CDATA[
+  
+    function preprocess(row, ctx) {
+      if(ctx.resolve("dataimporter.request.unindex") == "1") {
+        row.put("$skipDoc", "true");
+      }
+      return row;
+    }
+    
+    function stripNonIndexed(row) {
+      var content = row.get("plainText"),
+          begin = "<!-- indexer::stop -->",
+          end = "<!-- indexer::continue -->",
+          b = content.indexOf(begin, 0),
+          e, i, j;
+      
+      for(;;) {
+        e = i = j = b + begin.length;
+        
+        do {
+          j = content.indexOf(end, e);
+          if(j == -1) break; // no end tag found
+          e = j + end.length;
+          
+          i = content.indexOf(begin, i);
+          if(i == -1) break; // no next begin tag
+          i = i + begin.length;
+          
+        } while(i < j);
+        
+        if(e == b + begin.length) break; // no end tag found
+        
+        content = content.substr(0, b) + content.substr(e);
+        
+        if(i == -1) break; // no next begin tag found
+        
+        b = i + b - e - begin.length; // correct position of next begin tag
+      }
+      
+      var str = new java.lang.String(content);
+      row.put("plainText", str.getBytes());
+      return row;
+    }
+    
+  ]]></script>
+
+  <dataSource name="web" type="URLDataSource" />
+  <dataSource name="db" type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/ct2113"
+    user="root" password="" />
+  <dataSource name="fieldStream" type="FieldStreamDataSource" />
+  <dataSource name="fieldReader" type="FieldReaderDataSource" />
+
+  <document>
+
+    <entity name="req" rootEntity="false" processor="PlainTextEntityProcessor" dataSource="web"
+      url="${dataimporter.request.pages}" transformer="script:preprocess,TemplateTransformer"
+      preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;">
+      <field column="m_source_s" template="${dataimporter.request.source}" />
+      <!-- ignore_ makes the request body an unindexed dynamic field (just dropped on index update) -->
+      <field column="plainText" name="ignore_pages" />
+
+      <entity name="index" rootEntity="false" processor="SqlEntityProcessor" dataSource="db"
+        query="
+              SELECT  s.page AS m_page_i,
+	                  s.root AS m_root_i,
+	                  s.url AS m_url_s,
+	                  p.pageTitle AS title,
+	                  p.language AS m_language_s
+	          FROM    tl_bbit_solr_page AS s
+	          JOIN    tl_page AS p ON p.id = s.page
+	          WHERE   p.id IN (${req.plainText})
+	          AND     p.type = 'regular'
+         ">
+
+        <entity name="fetch" rootEntity="false" processor="PlainTextEntityProcessor" dataSource="web"
+          url="${index.m_url_s}" transformer="script:stripNonIndexed">
+
+          <entity name="page" processor="TikaEntityProcessor" dataSource="fieldStream" dataField="fetch.plainText"
+            transformer="TemplateTransformer">
+            <field column="m_doctype_s" template="SolrContaoPageDocument" />
+            <field column="text" name="text" />
+            <field column="id" template="${index.m_url_s}" />
+          </entity>
+          
+          <entity name="tagsoup2" rootEntity="false" processor="TikaEntityProcessor" dataSource="fieldStream"
+            dataField="fetch.plainText" format="xml">
+            
+            <entity name="base2" rootEntity="false" processor="XPathEntityProcessor" dataSource="fieldReader"
+              dataField="tagsoup2.text" xsl="images.xsl" forEach="/images">
+              <field column="ignore_base" xpath="//base" />
+              
+              <entity name="images2" processor="XPathEntityProcessor" dataSource="fieldReader"
+                dataField="tagsoup2.text" xsl="images.xsl" forEach="/images/image" transformer="TemplateTransformer">
+                <field column="title" xpath="//img/@title" />
+                <field column="m_url_s" xpath="//img/@src" template="${base2.ignore_base}${images2.m_url_s}" />
+                <field column="m_doctype_s" template="SolrImageDocument" />
+                <field column="id" template="${images2.m_url_s}" />
+              </entity>
+              
+            </entity>
+            
+          </entity>
+
+        </entity>
+
+      </entity>
+
+    </entity>
+
+  </document>
+
+</dataConfig>

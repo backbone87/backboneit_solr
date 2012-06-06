@@ -58,7 +58,7 @@ final class SolrDefaultSourceFactory extends SolrAbstractSourceFactory {
 	protected function configSource(ReflectionClass $objClass, SolrSource $objSource, array $arrConfig) {
 		foreach($arrConfig as $arrCall) {
 			$objMethod = $objClass->getMethod($arrCall[0]);
-			if(!$objMethod->isPublic()) {
+			if($objMethod->isPublic()) {
 				$arrCall[0] = $objSource;
 				call_user_func_array(array($objMethod, 'invoke'), $arrCall);
 			}

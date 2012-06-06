@@ -2,8 +2,6 @@
 
 class SolrContaoPageSource extends SolrAbstractSource {
 	
-	const PAGES_FILE = 'system/html/bbit_solr_page.txt';
-	
 	protected $arrRoots;
 	
 	protected $blnExtract;
@@ -35,7 +33,7 @@ class SolrContaoPageSource extends SolrAbstractSource {
 		
 		$objQuery->reset();
 		$objQuery->setParam('source', $this->getName());
-		$objQuery->setParam('pages', Environment::getInstance()->base . self::PAGES_FILE);
+		$objQuery->setParam('pages', Environment::getInstance()->base . $this->getPagesFile());
 		return $objQuery->execute();
 	}
 	
@@ -81,10 +79,14 @@ class SolrContaoPageSource extends SolrAbstractSource {
 		$arrRoots = $this->arrRoots ? $this->arrRoots : array(0);
 		$arrPages = SolrUtils::getInstance()->getChildRecords($arrRoots, 'tl_page');
 		
-		$objFile = new File(self::PAGES_FILE);
+		$objFile = new File($this->getPagesFile());
 		$objFile->write(implode(',', $arrPages));
 		$objFile->close();
 		unset($objFile);
+	}
+	
+	protected function getPagesFile() {
+		return 'system/html/bbit_solr/' . str_replace('/', '_', $this->getName()) . '.txt';
 	}
 	
 }

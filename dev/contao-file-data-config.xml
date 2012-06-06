@@ -1,0 +1,37 @@
+<dataConfig>
+  <script><![CDATA[
+  
+    function preprocess(row, ctx) {
+      if(ctx.resolve("dataimporter.request.unindex") == "1") {
+        row.put("$skipDoc", "true");
+      }
+      return row;
+    }
+    
+  ]]></script>
+
+  <dataSource name="web" type="URLDataSource" />
+  <dataSource name="webBin" type="BinURLDataSource" />
+
+  <document>
+
+    <entity name="req" rootEntity="false" processor="LineEntityProcessor" dataSource="web"
+      url="${dataimporter.request.files}" transformer="script:preprocess,TemplateTransformer,RegexTransformer"
+      preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;">
+      <field column="m_source_s" template="${dataimporter.request.source}" />
+      <field column="m_base_s" template="${dataimporter.request.base}" />
+      <!-- ignore_ makes the request body an unindexed dynamic field (just dropped on index update) -->
+      <field column="rawLine" name="ignore_rawLine" regex="([^\,]+)\,(.*)" groupNames="m_doctype_s,m_path_s" />
+      
+      <entity name="file" processor="TikaEntityProcessor" dataSource="webBin"
+        url="${dataimporter.request.base}${req.m_path_s}" transformer="TemplateTransformer">
+        <field column="title" name="title" />
+        <field column="text" name="text" />
+        <field column="id" template="${req.m_base_s}${req.m_path_s}" />
+      </entity>
+
+    </entity>
+
+  </document>
+
+</dataConfig>

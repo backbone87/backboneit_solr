@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?><html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<base/><link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Ubuntu"/><link rel="stylesheet" href="http://localhost/ct/ct2113/system/scripts/0e109b59641d.css" media="all"/><link rel="alternate" href="http://localhost/ct/ct2113/news.xml" type="application/rss+xml"/><meta name="robots" content="index,follow"/>
+<meta name="keywords" content=""/>
+<meta name="description" content="Welcome to Music Academy"/>
+<meta name="Content-Location" content="http://localhost/ct/ct2113/"/>
+<meta name="Content-Encoding" content="ISO-8859-1"/>
+<meta name="Content-Type" content="text/html"/>
+<title>Welcome to Music Academy - Music Academy</title>
+</head>
+<body>
+
+
+
+
+
+
+<img src="http://localhost/ct/ct2113/tl_files/music_academy/image.png" width="670" height="273" alt="Music academy"/>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+<h1>Front End Login</h1>
+
+
+
+
+
+
+Username
+
+
+Password
+
+
+ Remember me
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{{link_open::20}}Did you lose your password?
+
+
+
+
+
+
+
+<h1>Breaking news</h1>
+
+
+
+<p>2010-02-04 09:30  </p>
+
+<h2><a shape="rect" href="http://localhost/ct/ct2113/news/items/james-wilson-returns.html">Associate Professor James Wilson returns</a></h2>
+
+
+
+
+
+
+
+
+
+
+<a shape="rect" href="http://localhost/ct/ct2113/">Music Academy</a> &gt; 
+Welcome to Music Academy
+
+
+
+
+
+
+
+
+
+  <a shape="rect" href="http://localhost/ct/ct2113/#" rel="nofollow"><img src="http://localhost/ct/ct2113/system/modules/frontend/html/print.gif" width="16" height="16" alt=""/></a> 
+  <a shape="rect" href="http://localhost/ct/ct2113/index.php/?pdf=1" rel="nofollow"><img src="http://localhost/ct/ct2113/system/modules/frontend/html/pdf.gif" width="16" height="16" alt=""/></a> 
+  <a shape="rect" href="http://localhost/ct/ct2113/share.php?p=facebook&amp;u=http%3A%2F%2Flocalhost%2Fct%2Fct2113%2Findex.php%2F&amp;t=Welcome%20to%20Music%20Academy" rel="nofollow"><img src="http://localhost/ct/ct2113/sy  &lt;div class=" alt=""/>
+
+</a><h1>Contao demo website</h1>
+
+
+A content management system is usually divided into two areas: the back end (administration area) and the front end (website). If you are reading this, you are currently viewing the front end. To log in to the back end, simply add /contao to your URL ({{env::path}}contao). 
+
+
+
+When I was creating the example website to give people an idea of what can be done with a content management system, I tried to find a "real world" scenario that involved more than one person. There are a lot of different scenarios that can be done with Contao: from a simple website managed by a single administrator to a community website with a lot of members (front end users) or a company website (intranet or internet) with a lot of back end users. Finally, I came up with a college website that has different back end users and front end users.
+
+
+
+The Music Academy example includes three back end users (employees) and two front end users (students). Each user has a different role. You can log in to their accounts and see how Contao looks from their perspective. Please note that academy employees (back end user) can only log in to the back end and students (front end user) can only log in to the front end. You are currently viewing the front end.
+
+
+
+
+<h1>User accounts</h1>
+
+
+
+
+
+1. Kevin Jones 
+
+
+
+
+
+Username: k.jones
+
+Password: kevinjones
+
+Role: back end user and administrator
+
+
+
+
+
+
+
+
+
+
+2. Helen Lewis 
+
+
+
+
+
+Username: h.lewis
+
+Password: helenlewis
+
+Role: back end user
+
+
+
+
+
+
+
+
+
+
+3. James Wilson 
+
+
+
+
+
+Username: j.wilson
+
+Password: jameswilson
+
+Role: back end user
+
+
+
+
+
+
+
+
+
+
+4. John Smith 
+
+
+
+
+
+Username: j.smith
+
+Password: johnsmith
+
+Role: front end user
+
+
+
+
+
+
+
+
+
+
+5. Donna Evans 
+
+
+
+
+
+Username: d.evans
+
+Password: donnaevans
+
+Role: front end user
+
+
+
+
+
+
+
+
+
+<h1>Roles and permissions</h1>
+
+
+On the next page (The academy) we will take a closer look at the different roles and we will find out what our users are allowed to do and what they cannot do. You can then take a closer look at how these access restrictions have been implemented in the back end.
+
+
+
+Make sure to visit <a shape="rect" href="http://www.contao.org/">http://www.contao.org</a> for more information.
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body></html>

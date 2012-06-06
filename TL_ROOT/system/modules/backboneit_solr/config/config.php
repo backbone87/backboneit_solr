@@ -24,27 +24,41 @@ $GLOBALS['SOLR_DEFAULT_INDEX'] = array(
 // 			'type'		=> 'solr.ExtractingRequestHandler',
 // 			'query'		=> 'SolrExtractingUpdateQuery',
 // 		),
-// 		array(
-// 			'name'		=> '/select',
-// 			'type'		=> 'solr.SearchHandler',
-// 			'query'		=> 'SolrSearchQuery',
-// 		),
 		array(
-			'name'		=> '/cto2solr',
+			'name'		=> '/select',
+			'type'		=> 'solr.SearchHandler',
+			'query'		=> 'SolrSearchQuery',
+		),
+		array(
+			'name'		=> '/update/contao-page',
+			'type'		=> 'solr.handler.dataimport.DataImportHandler',
+			'query'		=> 'SolrDIHQuery',
+		),
+		array(
+			'name'		=> '/update/contao-file',
 			'type'		=> 'solr.handler.dataimport.DataImportHandler',
 			'query'		=> 'SolrDIHQuery',
 		),
 	),
 	'sources' => array(
-		array('name' => 'bbit_solr_page', 'handler' => '/cto2solr'),
+		array('name' => 'bbit_solr_page', 'handler' => '/update/contao-page'),
+		array('name' => 'bbit_solr_file_pdf', 'handler' => '/update/contao-file'),
 	),
 );
 
 $GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES']['bbit_solr_page'] = array(
 	'class' => 'SolrContaoPageSource',
 	'config' => array(
-		array('setRoots', 0),
-		array('setExtractImages', true),
+// 		array('setRoots', 0),
+// 		array('setExtractImages', true),
+	)
+);
+$GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES']['bbit_solr_file_pdf'] = array(
+	'class' => 'SolrFileSource',
+	'config' => array(
+// 		array('setRoots', 'tl_files'),
+		array('setExtension', 'pdf'),
+		array('setBase', 'http://localhost/ct/ct2113/'),
 	)
 );
 

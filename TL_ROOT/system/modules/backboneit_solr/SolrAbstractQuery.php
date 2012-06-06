@@ -2,30 +2,19 @@
 
 abstract class SolrAbstractQuery implements SolrQuery {
 	
-	/**
-	 * The writer type parameter name.
-	 * @var string
-	 */
-	const PARAM_WT	= 'wt';
-	
-	/**
-	 * The writer type parameter value to select the JSON response writer.
-	 * @var string
-	 */
-	const WT_JSON	= 'json';
-	
 	protected $objHandler;
 	
-	protected $arrParams = array();
+	protected $arrParams;
 	
 	protected $strContent;
 	
-	protected $strContentMIME = 'application/octet-stream';
+	protected $strContentMIME;
 	
 	protected $objResult;
 	
 	protected function __construct(SolrRequestHandler $objHandler) {
 		$this->objHandler = $objHandler;
+		$this->reset();
 	}
 	
 	public function getRequestHandler() {
@@ -80,23 +69,15 @@ abstract class SolrAbstractQuery implements SolrQuery {
 		}
 		
 		$this->prepareRequest($objRequest);
-		
-		echo '<pre>';
-		var_dump($this->getRequestURL());
-		
+				
 		if(!$objRequest->send($this->getRequestURL())) {
 			return false;
 		}
-		var_dump($objRequest->hasError());
-		var_dump($objRequest->request);
-		var_dump($objRequest->response);
-		echo '</pre>';
-// 		exit;
 		
 		$this->objResult = $this->createResult($objRequest);
 		
-// 		return $this->objResult->isSucceed();
-		return true;
+// 		$this->objResult->dump();
+		return $this->objResult != null;
 	}
 	
 	public function getResult() {
@@ -104,8 +85,9 @@ abstract class SolrAbstractQuery implements SolrQuery {
 	}
 	
 	public function reset() {
-		$this->arrParams = array();
 		unset($this->objResult, $this->strContent, $this->strContentMIME);
+		$this->arrParams = array();
+		$this->setWriterType();
 	}
 	
 	public function getWriterType() {

@@ -2,6 +2,18 @@
 
 interface SolrQuery {
 	
+	/**
+	 * The writer type parameter name.
+	 * @var string
+	 */
+	const PARAM_WT	= 'wt';
+	
+	/**
+	 * The writer type parameter value to select the JSON response writer.
+	 * @var string
+	 */
+	const WT_JSON	= 'json';
+	
 	public function getRequestHandler();
 	
 	public function getParam($strName);
