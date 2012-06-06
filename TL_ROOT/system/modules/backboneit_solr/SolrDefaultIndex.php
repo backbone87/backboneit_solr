@@ -29,7 +29,7 @@ final class SolrDefaultIndex extends SolrAbstractIndex {
 	}
 	
 	protected function runUpdateFor(SolrSource $objSource) {
-		$objSource->index($this, $this->getRequestHandler($this->arrSources[$objSource->getName()]['handler']));
+		$objSource->index($this->getRequestHandler($this->arrSources[$objSource->getName()]['handler']));
 	}
 	
 	public function initialize() {

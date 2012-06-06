@@ -32,7 +32,7 @@ final class SolrDefaultSourceFactory extends SolrAbstractSourceFactory {
 				return null;
 			}
 			
-			$objSource = $objClass->getMethod('create')->invoke($strName);
+			$objSource = $objClass->newInstance($strName);
 			if(!$objSource) {
 				return null;
 			}

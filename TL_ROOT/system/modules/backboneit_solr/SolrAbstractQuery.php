@@ -2,15 +2,27 @@
 
 abstract class SolrAbstractQuery implements SolrQuery {
 	
+	/**
+	 * The writer type parameter name.
+	 * @var string
+	 */
+	const PARAM_WT	= 'wt';
+	
+	/**
+	 * The writer type parameter value to select the JSON response writer.
+	 * @var string
+	 */
+	const WT_JSON	= 'json';
+	
 	protected $objHandler;
 	
 	protected $arrParams = array();
 	
-	protected $objRequest;
-	
 	protected $strContent;
 	
 	protected $strContentMIME = 'application/octet-stream';
+	
+	protected $objResult;
 	
 	protected function __construct(SolrRequestHandler $objHandler) {
 		$this->objHandler = $objHandler;
@@ -18,6 +30,43 @@ abstract class SolrAbstractQuery implements SolrQuery {
 	
 	public function getRequestHandler() {
 		return $this->objHandler;
+	}
+
+	public function getParam($strName) {
+		return $this->arrParams[$strName];
+	}
+	
+	public function setParam($strName, $strValue) {
+		$this->arrParams[$strName] = $strValue;
+	}
+	
+	public function unsetParam($strName) {
+		unset($this->arrParams[$strName]);
+	}
+
+	public function getParams() {
+		return $this->arrParams;
+	}
+
+	public function setParams(array $arrParams) {
+		$this->arrParams = $arrParams;
+	}
+
+	public function addParams(array $arrParams) {
+		$this->arrParams = array_merge($this->arrParams, $arrParams);
+	}
+	
+	public function getContent() {
+		return $this->strContent;
+	}
+	
+	public function getContentMIME() {
+		return $this->strContentMIME;
+	}
+	
+	public function setContent($strContent, $strMIME = 'application/octet-stream') {
+		$this->strContent = $strContent;
+		$this->strContentMIME = $strMIME;
 	}
 	
 	public function execute() {
@@ -32,46 +81,39 @@ abstract class SolrAbstractQuery implements SolrQuery {
 		
 		$this->prepareRequest($objRequest);
 		
-		if($objRequest->send($this->getRequestURL())) {
+		echo '<pre>';
+		var_dump($this->getRequestURL());
+		
+		if(!$objRequest->send($this->getRequestURL())) {
 			return false;
 		}
+		var_dump($objRequest->hasError());
+		var_dump($objRequest->request);
+		var_dump($objRequest->response);
+		echo '</pre>';
+// 		exit;
 		
-		$objResult = $this->createResult($objRequest);
+		$this->objResult = $this->createResult($objRequest);
 		
-		return $objResult->isSucceed();
+// 		return $this->objResult->isSucceed();
+		return true;
 	}
 	
-	public function setParam($strName, $strValue) {
-		$this->arrParams[$strName] = $strValue;
-	}
-
-	public function setParams(array $arrParams) {
-		$this->arrParams = $arrParams;
-	}
-
-	public function addParams(array $arrParams) {
-		$this->arrParams = array_merge($this->arrParams, $arrParams);
-	}
-
-	public function getParam($strName) {
-		return $this->arrParams[$strName];
-	}
-
-	public function getParams() {
-		return $this->arrParams;
+	public function getResult() {
+		return $this->objResult;
 	}
 	
-	public function getContent() {
-		return $this->strContent;
+	public function reset() {
+		$this->arrParams = array();
+		unset($this->objResult, $this->strContent, $this->strContentMIME);
 	}
 	
-	public function getContentMIME() {
-		return $this->strContentMIME;
+	public function getWriterType() {
+		return $this->getParam(self::PARAM_WT);
 	}
 	
-	public function setContent($strContent, $strMIME = 'application/octet-stream') {
-		$this->strContent = $strContent;
-		$this->strContentMIME = $strMIME;
+	public function setWriterType($strType = self::WT_JSON) {
+		$this->setParam(self::PARAM_WT, $strType);
 	}
 	
 	public function getRequestURL() {

@@ -11,12 +11,12 @@ final class SolrContaoPageSourceManager extends Controller {
 		return self::$objInstance;
 	}
 	
-	private function __construct() {
+	protected function __construct() {
 		parent::__construct();
 		$this->import('Database');
 	}
 	
-	private function __clone() {
+	protected function __clone() {
 	}
 	
 	public function hookOutputFrontendTemplate() {
@@ -27,20 +27,20 @@ final class SolrContaoPageSourceManager extends Controller {
 		$intTime = time();
 		$intPage = $GLOBALS['objPage']->id;
 		$strURL = $this->Environment->base . $this->Environment->request;
-		$intRoot = $GLOBALS['objPage']->root;
+		$intRoot = $GLOBALS['objPage']->rootId;
 		
 		$intCnt = $this->Database->prepare(
-			'SELECT COUNT(*) AS cnt FROM tl_bbit_solr_page WHERE id = ? AND url = ? AND root = ?'
+			'SELECT COUNT(*) AS cnt FROM tl_bbit_solr_page WHERE page = ? AND url = ? AND root = ?'
 		)->execute($intPage, $strURL, $intRoot)->cnt;
 		
 		if($intCnt) {
 			$this->Database->prepare(
-				'UPDATE tl_bbit_solr_page WHERE id = ? AND url = ? AND root = ? SET tstamp = ?'
-			)->execute($intPage, $strURL, $intRoot, $intTime);
+				'UPDATE tl_bbit_solr_page SET tstamp = ? WHERE page = ? AND url = ? AND root = ?'
+			)->execute($intTime, $intPage, $strURL, $intRoot);
 			
 		} else {
 			$this->Database->prepare(
-				'INSERT INTO tl_bbit_solr_page'
+				'INSERT INTO tl_bbit_solr_page %s'
 			)->set(array(
 				'page' => $intPage,
 				'url' => $strURL,

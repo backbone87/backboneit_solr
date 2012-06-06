@@ -2,33 +2,63 @@
 
 class SolrContaoPageSource extends SolrAbstractSource {
 	
+	const PAGES_FILE = 'system/html/bbit_solr_page.txt';
+	
 	protected $arrRoots;
 	
 	protected $blnExtract;
 	
-	public function __construct() {
-		parent::__construct();
+	public function __construct($strName) {
+		parent::__construct($strName);
+	}
+	
+	public function getDocumentTypes() {
+		return array('SolrContaoPageDocument', 'SolrImageDocument');
+	}
+	
+	public function getFields() {
+		return array();
 	}
 	
 	public function index(SolrRequestHandler $objHandler) {
 		if(!$this->isCompatibleRequestHandler($objHandler)) {
-			return;
+			return false;
 		}
 		
 		$objQuery = $objHandler->createQuery();
-		$objQuery->setParam('command', 'full-import');
-		$objQuery->setParam('clean', 'false');
+		$objQuery->setCommand(SolrDIHQuery::COM_ABORT);
+		if(!$objQuery->execute()) {
+			return false;
+		}
+		
+		$this->generatePagesFile();
+		
+		$objQuery->reset();
 		$objQuery->setParam('source', $this->getName());
-		$objQuery->setContent($this->compileContent(), 'text/plain');
+		$objQuery->setParam('pages', Environment::getInstance()->base . self::PAGES_FILE);
 		return $objQuery->execute();
 	}
 	
 	public function unindex(SolrRequestHandler $objHandler) {
-		// TODO implement unindexing
+		if(!$this->isCompatibleRequestHandler($objHandler)) {
+			return false;
+		}
+		
+		$objQuery = $objHandler->createQuery();
+		$objQuery->setCommand(SolrDIHQuery::COM_ABORT);
+		if(!$objQuery->execute()) {
+			return false;
+		}
+		
+		$objQuery->reset();
+		$objQuery->setParam('source', $this->getName());
+		$objQuery->setParam('unindex', 1);
+		return $objQuery->execute();
 	}
 	
-	public function isCompatibleRequestHandler($objHandler) {
-		return $objHandler->getQueryClass() == 'SolrDIHQuery';
+	public function isCompatibleRequestHandler(SolrRequestHandler $objHandler) {
+		return $objHandler->getQueryClass()->getName() == 'SolrDIHQuery'
+			|| $objHandler->getQueryClass()->isSubclassOf('SolrDIHQuery');
 	}
 	
 	public function getRoots() {
@@ -47,10 +77,14 @@ class SolrContaoPageSource extends SolrAbstractSource {
 		$this->blnExtract = $blnExtract;
 	}
 	
-	protected function compileContent() {
+	protected function generatePagesFile() {
 		$arrRoots = $this->arrRoots ? $this->arrRoots : array(0);
 		$arrPages = SolrUtils::getInstance()->getChildRecords($arrRoots, 'tl_page');
-		return implode(',', $arrPages);
+		
+		$objFile = new File(self::PAGES_FILE);
+		$objFile->write(implode(',', $arrPages));
+		$objFile->close();
+		unset($objFile);
 	}
 	
 }

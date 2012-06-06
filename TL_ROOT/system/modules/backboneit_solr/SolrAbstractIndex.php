@@ -71,9 +71,6 @@ abstract class SolrAbstractIndex implements SolrIndex {
 		foreach($this->getSources() as $objSource) {
 			if(!$blnScheduled || $this->isUpdateScheduledFor($objSource)) {
 				SolrUtils::getInstance()->executeCallbacks('beforeUpdate', $this, $objSource);
-				
-				var_dump($this->getName(), 'runUpdateFor', $objSource->getName());
-				exit;
 				$this->runUpdateFor($objSource);
 				SolrUtils::getInstance()->executeCallbacks('afterUpdate', $this, $objSource);
 			}

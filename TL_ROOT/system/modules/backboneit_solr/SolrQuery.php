@@ -8,6 +8,8 @@ interface SolrQuery {
 	
 	public function setParam($strName, $strValue);
 	
+	public function unsetParam($strName);
+	
 	public function getParams();
 	
 	public function setParams(array $arrParams);
@@ -23,5 +25,7 @@ interface SolrQuery {
 	public function execute();
 	
 	public function getResult();
+	
+	public function reset();
 	
 }
