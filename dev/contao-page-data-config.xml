@@ -92,7 +92,7 @@
               
               <entity name="images2" processor="XPathEntityProcessor" dataSource="fieldReader"
                 dataField="tagsoup2.text" xsl="images.xsl" forEach="/images/image" transformer="TemplateTransformer">
-                <field column="title" xpath="//img/@title" />
+                <field column="title" xpath="//img/@alt" />
                 <field column="m_url_s" xpath="//img/@src" template="${base2.ignore_base}${images2.m_url_s}" />
                 <field column="m_doctype_s" template="SolrImageDocument" />
                 <field column="id" template="${images2.m_url_s}" />

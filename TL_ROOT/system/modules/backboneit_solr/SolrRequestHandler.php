@@ -10,8 +10,8 @@ interface SolrRequestHandler {
 	
 	public function getEndpoint();
 	
-	public function getQueryClass();
+	public function hasQueryClass($strClass);
 	
-	public function createQuery();
+	public function createQuery($strClass = null);
 	
 }

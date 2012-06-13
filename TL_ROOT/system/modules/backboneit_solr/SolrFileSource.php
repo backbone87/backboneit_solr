@@ -59,8 +59,7 @@ class SolrFileSource extends SolrAbstractSource {
 	}
 	
 	public function isCompatibleRequestHandler(SolrRequestHandler $objHandler) {
-		return $objHandler->getQueryClass()->getName() == 'SolrDIHQuery'
-			|| $objHandler->getQueryClass()->isSubclassOf('SolrDIHQuery');
+		return $objHandler->hasQueryClass('SolrDIHQuery');
 	}
 	
 	public function getRoots() {

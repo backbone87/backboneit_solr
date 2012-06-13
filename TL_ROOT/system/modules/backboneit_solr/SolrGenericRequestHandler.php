@@ -13,7 +13,7 @@ class SolrGenericRequestHandler implements SolrRequestHandler {
 	public function __construct($strName, $strType, SolrIndex $objIndex, $strQueryClass) {
 		$objQueryClass = new ReflectionClass($strQueryClass);
 		if(!$objQueryClass->isSubclassOf('SolrQuery')) {
-			throw new Exception(sprintf('Query class [%s] is not of type SolrQuery', $strQueryClass));
+			throw new InvalidArgumentException(sprintf('Query class [%s] is not of type SolrQuery', $strQueryClass));
 		}
 		
 		$this->strName = '/' . trim($strName, ' /');
@@ -38,11 +38,14 @@ class SolrGenericRequestHandler implements SolrRequestHandler {
 		return $this->getIndex()->getEndpoint() . $this->getName();
 	}
 	
-	public function getQueryClass() {
-		return $this->objQueryClass;
+	public function hasQueryClass($strClass) {
+		return $this->objQueryClass->getName() == $strClass || $this->objQueryClass->isSubclassOf($strClass);
 	}
 	
-	public function createQuery() {
+	public function createQuery($strClass = null) {
+		if(strlen($strClass) && !$this->isQueryClass($strClass)) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		}
 		return $this->objQueryClass->newInstance($this);
 	}
 	
