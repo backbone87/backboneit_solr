@@ -2,14 +2,21 @@
 
 class SolrDefaultIndexFactory extends SolrAbstractIndexFactory {
 	
+	const DEFAULT_INDEX_NAME = 'default';
+	
 	public function getIndexNames() {
-		return array('default');
+		return array(self::DEFAULT_INDEX_NAME);
 	}
 	
 	public function getIndex($strName) {
-		if($strName == 'default') {
+		if($strName == self::DEFAULT_INDEX_NAME) {
 			return SolrDefaultIndex::getInstance();
 		}
+		throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+	}
+	
+	public function hasIndex($strName) {
+		return $strName == self::DEFAULT_INDEX_NAME;
 	}
 	
 	protected function __construct() {

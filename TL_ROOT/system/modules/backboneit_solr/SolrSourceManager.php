@@ -23,7 +23,7 @@ final class SolrSourceManager extends SolrAbstractSourceFactory {
 			$arrNames[] = $objFactory->getSourceNames();
 		}
 	
-		return $arrNames ? call_user_func_array('array_merge', $arrNames) : array();;
+		return $arrNames ? call_user_func_array('array_merge', $arrNames) : $arrNames;
 	}
 	
 	public function getSources() {
@@ -33,14 +33,14 @@ final class SolrSourceManager extends SolrAbstractSourceFactory {
 			$arrSources[] = $objFactory->getSources();
 		}
 	
-		return $arrSources ? call_user_func_array('array_merge', $arrSources) : array();
+		return $arrSources ? call_user_func_array('array_merge', $arrSources) : $arrSources;
 	}
 	
 	public function getSource($strName) {
 		foreach($this->arrFactories as $objFactory) if($objFactory->hasSource($strName)) {
 			return $objFactory->getSource($strName);
 		}
-		return null;
+		throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 	}
 	
 	public function hasSource($strName) {

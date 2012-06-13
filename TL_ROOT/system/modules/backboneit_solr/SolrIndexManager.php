@@ -2,8 +2,15 @@
 
 final class SolrIndexManager extends SolrAbstractIndexFactory {
 	
-	public static function findIndex($strName) {
-		return self::getInstance()->getIndex($strName);
+	public static function findIndex($strName, $blnException = true) {
+		try {
+			return self::getInstance()->getIndex($strName);
+		} catch(SolrException $e) {
+			if($blnException) {
+				throw $e;
+			}
+			return null;
+		}
 	}
 	
 	protected $arrFactories = array();
@@ -31,7 +38,7 @@ final class SolrIndexManager extends SolrAbstractIndexFactory {
 		foreach($this->arrFactories as $objFactory) {
 			$arrNames[] = $objFactory->getIndexNames();
 		}
-		return $arrNames ? call_user_func_array('array_merge', $arrNames) : array();
+		return $arrNames ? call_user_func_array('array_merge', $arrNames) : $arrNames;
 	}
 	
 	public function getIndexes() {
@@ -46,7 +53,7 @@ final class SolrIndexManager extends SolrAbstractIndexFactory {
 		foreach($this->arrFactories as $objFactory) if($objFactory->hasIndex($strName)) {
 			return $objFactory->getIndex($strName);
 		}
-		return null;
+		throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 	}
 	
 	public function hasIndex($strName) {

@@ -7,7 +7,7 @@ final class SolrUtils extends Backend {
 			if(is_string($varString)) {
 				$arrCollection[$varString] = true;
 			} elseif(is_array($varString)) {
-				self::collectStringArgs($arrCollection, $varString);
+				self::unnestStringsAsSet($arrCollection, $varString);
 			}
 		}
 	}
@@ -21,8 +21,14 @@ final class SolrUtils extends Backend {
 	}
 	
 	public function getSearchHandlerOptions($objDC) {
-		$objIndex = SolrIndexManager::findIndex($objDC->activeRecord->bbit_solr_index);
-		return $objIndex ? array_keys($objIndex->getRequestHandlersByQueryClass('SolrSearchQuery')) : array();
+		try {
+			$objIndex = SolrIndexManager::findIndex($objDC->activeRecord->bbit_solr_index);
+			return array_keys($objIndex->getRequestHandlersByQueryClass('SolrSearchQuery'));
+			
+		} catch(SolrException $e) {
+			self::logException($e);
+			return array();
+		}
 	}
 	
 	public function getSourceOptions() {
@@ -34,22 +40,32 @@ final class SolrUtils extends Backend {
 	}
 	
 	public function getSourceOptionsByIndex($objDCA) {
-		$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
 		$arrSources = array();
-		if($objIndex) foreach($objIndex->getSources() as $objSource) {
-			$arrSources[$objSource->getName()] = $objSource->getDisplayName();
+		try {
+			$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
+			foreach($objIndex->getSources() as $objSource) {
+				$arrSources[$objSource->getName()] = $objSource->getDisplayName();
+			}
+			
+		} catch(SolrException $e) {
+			self::logException($e);
 		}
 		return $arrSources;
 	}
 	
 	public function getDocumentTypeOptionsByIndex($objDCA) {
-		$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
 		$arrTypes = array();
-		if($objIndex) foreach($objIndex->getSources() as $objSource) {
-			foreach($objSource->getDocumentTypes() as $strDocType) {
-				$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
-				$arrTypes[$strDocType] = $strLabel ? $strLabel : $strDocType;
+		try {
+			$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
+			foreach($objIndex->getSources() as $objSource) {
+				foreach($objSource->getDocumentTypes() as $strDocType) {
+					$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
+					$arrTypes[$strDocType] = $strLabel ? $strLabel : $strDocType;
+				}
 			}
+			
+		} catch(SolrException $e) {
+			self::logException($e);
 		}
 		return $arrTypes;
 	}
@@ -93,10 +109,10 @@ final class SolrUtils extends Backend {
 		return $arrTpls;
 	}
 	
-	public function getSearchModuleOptions($objDCA) {
+	public function getResultModuleOptions($objDCA) {
 		$objResult = $this->Database->prepare(
 			'SELECT id, name FROM tl_module WHERE id != ? AND (type = ? OR type = ?)'
-		)->execute($objDCA->activeRecord->id, 'bbit_solr_search', 'bbit_solr_result');
+		)->execute($objDCA->activeRecord->id, 'bbit_solr_result');
 		
 		$arrModules = array('bbit_solr_nocopy' => &$GLOBALS['TL_LANG']['bbit_solr']['nocopy']);
 		while($objResult->next()) {
@@ -148,6 +164,10 @@ final class SolrUtils extends Backend {
 			}
 		}
 		return $arrResults;
+	}
+	
+	public function logException(Exception $e) {
+		// TODO
 	}
 	
 	public function getSearchablePages() {

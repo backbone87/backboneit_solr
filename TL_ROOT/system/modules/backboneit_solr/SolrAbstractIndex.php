@@ -26,10 +26,10 @@ abstract class SolrAbstractIndex implements SolrIndex {
 	public function getRequestHandler($strName) {
 		$arrHandlers = $this->getRequestHandlers();
 		$strName = '/' . trim($strName, ' /');
-		if(!isset($arrHandlers[$strName])) {
-			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		if(isset($arrHandlers[$strName])) {
+			return $arrHandlers[$strName];
 		}
-		return $arrHandlers[$strName];
+		throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 	}
 	
 	public function getRequestHandlersByQueryClass($varQueryClass) {
@@ -72,10 +72,10 @@ abstract class SolrAbstractIndex implements SolrIndex {
 	
 	public function getSource($strName) {
 		$arrSources = $this->getSources();
-		if(!isset($arrSources[$strName])) {
-			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		if(isset($arrSources[$strName])) {
+			return $arrSources[$strName];
 		}
-		return $arrSources[$strName];
+		throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 	}
 	
 	public final function update($blnScheduled = true) {

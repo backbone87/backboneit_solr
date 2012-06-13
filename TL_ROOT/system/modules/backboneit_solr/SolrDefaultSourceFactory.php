@@ -22,33 +22,25 @@ final class SolrDefaultSourceFactory extends SolrAbstractSourceFactory {
 		}
 		
 		$arrSource = $GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES'][$strName];
-		if(!is_array($arrSource)) {
-			return null;
+		if(is_array($arrSource)) {
+			try {
+				$objClass = new ReflectionClass($arrSource['class']);
+				
+				if($objClass->isSubclassOf('SolrSource')) {
+					$objSource = $objClass->newInstance($strName);
+					$this->configSource($objClass, $objSource, $arrSource['config']);
+					$this->arrSources[$strName] = $objSource;
+					return $objSource;
+				}
+				
+			} catch (LogicException $e) {
+	// 			throw $e; // TODO correct exception handling
+			} catch (ReflectionException $e) {
+	// 			throw $e; // TODO correct exception handling
+			}
 		}
 		
-		try {
-			$objClass = new ReflectionClass($arrSource['class']);
-			if(!$objClass->isSubclassOf('SolrSource')) {
-				return null;
-			}
-			
-			$objSource = $objClass->newInstance($strName);
-			if(!$objSource) {
-				return null;
-			}
-			
-			$this->configSource($objClass, $objSource, $arrSource['config']);
-			
-			$this->arrSources[$strName] = $objSource;
-			return $objSource;
-			
-		} catch (LogicException $e) {
-			throw $e; // TODO correct exception handling
-		} catch (ReflectionException $e) {
-			throw $e; // TODO correct exception handling
-		}
-		
-		return null;
+		throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 	}
 	
 	public function cleanCache() {
