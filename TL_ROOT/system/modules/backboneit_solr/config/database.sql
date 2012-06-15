@@ -22,12 +22,20 @@ CREATE TABLE `tl_bbit_solr_page` (
 
 CREATE TABLE `tl_module` (
 
+  `bbit_solr_tpl` varchar(255) NOT NULL default '',
+	
+  `bbit_solr_rememberQuery` char(1) NOT NULL default '',
+  `bbit_solr_autocomplete` char(1) NOT NULL default '',
+  `bbit_solr_target` int(10) unsigned NOT NULL default '0',
+  `bbit_solr_live` char(1) NOT NULL default '',
+  `bbit_solr_liveTarget` int(10) unsigned NOT NULL default '0',
+  
   `bbit_solr_copy` varchar(255) NOT NULL default 'bbit_solr_nocopy',
   `bbit_solr_index` varchar(255) NOT NULL default '',
   `bbit_solr_handler` varchar(255) NOT NULL default '',
   `bbit_solr_sources` blob NULL,
   `bbit_solr_docTypes` blob NULL,
-  `bbit_solr_tpl` varchar(255) NOT NULL default '',
   `bbit_solr_docTpls` blob NULL,
+  `bbit_solr_showOnEmpty` char(1) NOT NULL default '',
   
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;

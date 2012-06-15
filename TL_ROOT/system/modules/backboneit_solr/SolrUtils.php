@@ -13,17 +13,20 @@ final class SolrUtils extends Backend {
 	}
 	
 	public function getIndexOptions() {
-		$arrOptions = array();
+		$arrIndexes = array();
 		foreach(SolrIndexManager::getInstance() as $strName => $objIndex) {
-			$arrOptions[$strName] = $objIndex->getDisplayName();
+			$arrIndexes[$strName] = $objIndex->getDisplayName();
 		}
-		return $arrOptions;
+		asort($arrIndexes);
+		return $arrIndexes;
 	}
 	
 	public function getSearchHandlerOptions($objDC) {
 		try {
 			$objIndex = SolrIndexManager::findIndex($objDC->activeRecord->bbit_solr_index);
-			return array_keys($objIndex->getRequestHandlersByQueryClass('SolrSearchQuery'));
+			$arrHandlers = array_keys($objIndex->getRequestHandlersByQueryClass('SolrSearchQuery'));
+			sort($arrHandlers);
+			return $arrHandlers;
 			
 		} catch(SolrException $e) {
 			self::logException($e);
@@ -36,6 +39,7 @@ final class SolrUtils extends Backend {
 		foreach(SolrSourceManager::getInstance() as $strName => $objSource) {
 			$arrOptions[$strName] = $objSource->getDisplayName();
 		}
+		asort($arrSources);
 		return $arrOptions;
 	}
 	
@@ -50,6 +54,7 @@ final class SolrUtils extends Backend {
 		} catch(SolrException $e) {
 			self::logException($e);
 		}
+		asort($arrSources);
 		return $arrSources;
 	}
 	
@@ -67,6 +72,7 @@ final class SolrUtils extends Backend {
 		} catch(SolrException $e) {
 			self::logException($e);
 		}
+		asort($arrTypes);
 		return $arrTypes;
 	}
 	
@@ -106,15 +112,19 @@ final class SolrUtils extends Backend {
 			$arrTpls = array_values($arrTpls);
 		}
 		
+		sort($arrTpls);
 		return $arrTpls;
 	}
 	
 	public function getResultModuleOptions($objDCA) {
 		$objResult = $this->Database->prepare(
-			'SELECT id, name FROM tl_module WHERE id != ? AND (type = ? OR type = ?)'
+			'SELECT id, name FROM tl_module WHERE id != ? AND type = ? ORDER BY name'
 		)->execute($objDCA->activeRecord->id, 'bbit_solr_result');
 		
-		$arrModules = array('bbit_solr_nocopy' => &$GLOBALS['TL_LANG']['bbit_solr']['nocopy']);
+		$arrModules = array();
+		if($objDCA && $GLOBALS['TL_DCA']['tl_module']['fields'][$objDCA->field]['bbit_solr_nocopyOption']) {
+			$arrModules['bbit_solr_nocopy'] = &$GLOBALS['TL_LANG']['bbit_solr']['nocopy'];
+		}
 		while($objResult->next()) {
 			$arrModules[$objResult->id] = $objResult->name . ' (ID ' . $objResult->id . ')';
 		}
