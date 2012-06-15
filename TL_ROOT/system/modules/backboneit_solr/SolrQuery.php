@@ -16,11 +16,15 @@ interface SolrQuery {
 	
 	public function getRequestHandler();
 	
+	public function getWriterType();
+	
+	public function setWriterType($strType = self::WT_JSON);
+	
 	public function getParam($strName);
 	
 	public function setParam($strName, $strValue);
 	
-	public function unsetParam($strName);
+	public function deleteParam($strName);
 	
 	public function getParams();
 	
@@ -28,15 +32,17 @@ interface SolrQuery {
 	
 	public function addParams(array $arrParams);
 	
+	public function hasContent();
+	
 	public function getContent();
 	
 	public function getContentMIME();
 	
 	public function setContent($strContent, $strMIME = 'application/octet-stream');
 	
-	public function execute();
+	public function deleteContent();
 	
-	public function getResult();
+	public function execute();
 	
 	public function reset();
 	

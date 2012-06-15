@@ -27,7 +27,11 @@ final class SolrIndexManager extends SolrAbstractIndexFactory {
 		SolrUtils::getInstance()->executeCallbacks('beforeRunUpdates', $this, $blnScheduled);
 		
 		foreach($this as $objIndex) {
-			$objIndex->update($blnScheduled);
+			try {
+				$objIndex->update($blnScheduled);
+			} catch(SolrException $e) {
+				SolrUtils::getInstance()->logException($e);
+			}
 		}
 		
 		SolrUtils::getInstance()->executeCallbacks('afterRunUpdates', $this, $blnScheduled);

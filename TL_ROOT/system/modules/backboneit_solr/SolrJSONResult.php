@@ -6,6 +6,10 @@ class SolrJSONResult implements SolrResult {
 	
 	public function __construct($strContent) {
 		$this->arrContent = json_decode($strContent, true);
+		
+		if(is_null($this->arrContent)) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		}
 	}
 	
 	public function getContent() {

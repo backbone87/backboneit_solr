@@ -26,7 +26,11 @@ class SolrDIHQuery extends SolrAbstractQuery {
 	}
 	
 	public function createResult(RequestExtended $objRequest) {
-		return $objRequest->hasError() ? null : new SolrJSONResult($objRequest->response);
+		if($objRequest->hasError()) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		}
+		
+		return new SolrJSONResult($objRequest->response);
 	}
 	
 	

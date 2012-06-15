@@ -2,23 +2,31 @@
 
 abstract class SolrAbstractQuery implements SolrQuery {
 	
-	protected $objHandler;
+	private $objHandler;
 	
-	protected $arrParams;
+	private $arrParams;
 	
-	protected $strContent;
+	private $strContent;
 	
-	protected $strContentMIME;
+	private $strContentMIME;
 	
-	protected $objResult;
-	
-	protected function __construct(SolrRequestHandler $objHandler) {
+	protected function __construct(SolrRequestHandler $objHandler, array $arrParams = null) {
 		$this->objHandler = $objHandler;
+		$this->arrParams = array();
 		$this->reset();
+		$this->arrParams = array_merge($this->arrParams, (array) $arrParams);
 	}
 	
 	public function getRequestHandler() {
 		return $this->objHandler;
+	}
+	
+	public function getWriterType() {
+		return $this->getParam(SolrQuery::PARAM_WT);
+	}
+	
+	public function setWriterType($strType = SolrQuery::WT_JSON) {
+		$this->setParam(SolrQuery::PARAM_WT, $strType);
 	}
 
 	public function getParam($strName) {
@@ -29,7 +37,7 @@ abstract class SolrAbstractQuery implements SolrQuery {
 		$this->arrParams[$strName] = $strValue;
 	}
 	
-	public function unsetParam($strName) {
+	public function deleteParam($strName) {
 		unset($this->arrParams[$strName]);
 	}
 
@@ -45,6 +53,10 @@ abstract class SolrAbstractQuery implements SolrQuery {
 		$this->arrParams = array_merge($this->arrParams, $arrParams);
 	}
 	
+	public function hasContent() {
+		return strlen($this->strContent) != 0;
+	}
+	
 	public function getContent() {
 		return $this->strContent;
 	}
@@ -58,44 +70,36 @@ abstract class SolrAbstractQuery implements SolrQuery {
 		$this->strContentMIME = $strMIME;
 	}
 	
+	public function deleteContent() {
+		unset($this->strContent, $this->strContentMIME);
+	}
+	
 	public function execute() {
 		$objRequest = new RequestExtended();
-		if(strlen($this->strContent)) {
-			$objRequest->data = $this->strContent;
-			$objRequest->datamime = $this->strContentMIME;
+		if($this->hasContent()) {
+			$objRequest->data = $this->getContent();
+			$objRequest->datamime = $this->getContentMIME();
 			$objRequest->method = 'POST';
 		} else {
 			$objRequest->method = 'GET';
 		}
 		
 		$this->prepareRequest($objRequest);
-				
-		if(!$objRequest->send($this->getRequestURL())) {
-			return false;
+		try {
+			$objRequest->send($this->getRequestURL());
+		} catch(Exception $e) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__ . ' - ' . $e->getMessage()); // TODO
 		}
 		
-		$this->objResult = $this->createResult($objRequest);
-		
-// 		$this->objResult->dump();
-		return $this->objResult != null;
-	}
-	
-	public function getResult() {
-		return $this->objResult;
+		$objResult = $this->createResult($objRequest);
+// 		$objResult->dump();
+		return $objResult;
 	}
 	
 	public function reset() {
 		unset($this->objResult, $this->strContent, $this->strContentMIME);
 		$this->arrParams = array();
 		$this->setWriterType();
-	}
-	
-	public function getWriterType() {
-		return $this->getParam(self::PARAM_WT);
-	}
-	
-	public function setWriterType($strType = self::WT_JSON) {
-		$this->setParam(self::PARAM_WT, $strType);
 	}
 	
 	public function getRequestURL() {

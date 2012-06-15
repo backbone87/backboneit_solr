@@ -20,14 +20,12 @@ class SolrContaoPageSource extends SolrAbstractSource {
 	
 	public function index(SolrRequestHandler $objHandler) {
 		if(!$this->isCompatibleRequestHandler($objHandler)) {
-			return false;
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 		}
 		
 		$objQuery = $objHandler->createQuery();
 		$objQuery->setCommand(SolrDIHQuery::COM_ABORT);
-		if(!$objQuery->execute()) {
-			return false;
-		}
+		$objQuery->execute();
 		
 		$this->generatePagesFile();
 		
@@ -39,14 +37,12 @@ class SolrContaoPageSource extends SolrAbstractSource {
 	
 	public function unindex(SolrRequestHandler $objHandler) {
 		if(!$this->isCompatibleRequestHandler($objHandler)) {
-			return false;
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 		}
 		
 		$objQuery = $objHandler->createQuery();
 		$objQuery->setCommand(SolrDIHQuery::COM_ABORT);
-		if(!$objQuery->execute()) {
-			return false;
-		}
+		$objQuery->execute();
 		
 		$objQuery->reset();
 		$objQuery->setParam('source', $this->getName());
