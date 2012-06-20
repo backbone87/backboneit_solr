@@ -6,8 +6,6 @@ interface SolrResult {
 	
 	public function getWriterType();
 	
-	public function isValid();
-	
-	public function wasSuccess();
+	public function isSuccess();
 	
 }

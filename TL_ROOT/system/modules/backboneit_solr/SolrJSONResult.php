@@ -20,12 +20,8 @@ class SolrJSONResult implements SolrResult {
 		return SolrQuery::WT_JSON;
 	}
 	
-	public function isValid() {
-		return (boolean) $this->arrContent;
-	}
-	
-	public function wasSuccess() {
-		return $this->isValid();
+	public function isSuccess() {
+		return true;
 	}
 	
 	public function dump() {
