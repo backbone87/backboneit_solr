@@ -4,7 +4,10 @@ $GLOBALS['FE_MOD']['application']['bbit_solr_search'] = 'ModuleSolrSearch';
 $GLOBALS['FE_MOD']['application']['bbit_solr_result'] = 'ModuleSolrResult';
 
 $GLOBALS['BE_MOD']['system']['bbit_solr_index'] = array('callback' => 'ModuleSolr'); 
+
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('SolrContaoPageSourceManager', 'hookOutputFrontendTemplate');
+
+$GLOBALS['TL_CRON']['daily'][] = array('SolrContaoPageSourceManager', 'deleteInvalid');
 $GLOBALS['TL_CRON']['daily'][] = array('SolrIndexManager', 'runUpdates');
 
 // $GLOBALS['BBIT_SOLR_HOOKS']['beforeRunUpdates'] = array('', '');

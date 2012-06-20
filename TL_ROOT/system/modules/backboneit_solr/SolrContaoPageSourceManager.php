@@ -26,28 +26,41 @@ final class SolrContaoPageSourceManager extends Controller {
 		
 		$intTime = time();
 		$intPage = $GLOBALS['objPage']->id;
-		$strURL = $this->Environment->base . $this->Environment->request;
+		$strBase = $this->Environment->base;
+		list($strRequest) = explode('?', $this->Environment->request, 2);
 		$intRoot = $GLOBALS['objPage']->rootId;
 		
 		$intCnt = $this->Database->prepare(
-			'SELECT COUNT(*) AS cnt FROM tl_bbit_solr_page WHERE page = ? AND url = ? AND root = ?'
-		)->execute($intPage, $strURL, $intRoot)->cnt;
+			'SELECT COUNT(*) AS cnt FROM tl_bbit_solr_page WHERE page = ? AND base = ? AND request = ? AND root = ?'
+		)->execute($intPage, $strBase, $strRequest, $intRoot)->cnt;
 		
 		if($intCnt) {
 			$this->Database->prepare(
-				'UPDATE tl_bbit_solr_page SET tstamp = ? WHERE page = ? AND url = ? AND root = ?'
-			)->execute($intTime, $intPage, $strURL, $intRoot);
+				'UPDATE tl_bbit_solr_page SET tstamp = ? WHERE page = ? AND base = ? AND request = ? AND root = ?'
+			)->execute($intTime, $intPage, $strBase, $strRequest, $intRoot);
 			
 		} else {
 			$this->Database->prepare(
 				'INSERT INTO tl_bbit_solr_page %s'
 			)->set(array(
 				'page' => $intPage,
-				'url' => $strURL,
+				'base' => $strBase,
+				'request' => $strRequest,
 				'root' => $intRoot,
 				'tstamp' => $intTime
 			))->execute();
 		}
+	}
+	
+	public function deleteInvalid() {
+		$this->Database->query(
+			'DELETE
+			FROM	s
+			USING	tl_bbit_solr_page AS s
+			LEFT JOIN tl_page AS p ON p.id = s.page
+			WHERE	p.id IS NULL
+			OR		0 = LOCATE(p.alias, s.request)'
+		);
 	}
 	
 // 	public function addSearchablePages() {
