@@ -9,6 +9,8 @@
     };
     
     function addTitleFromPath(row, ctx) {
+      //var title = row.get("title");
+      //if(title == undefined) 
       var title = new java.util.ArrayList();
       
       var path = row.get("m_path_s");

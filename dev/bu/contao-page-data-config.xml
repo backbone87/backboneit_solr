@@ -43,42 +43,11 @@
       return row;
     }
     
-     
-    function addTitleFromPath(row, ctx) {
-      //var title = new java.util.ArrayList();
-      var title = row.get("title");
-      
-      var path = row.get("m_src_s");
-      path = new String(path).split("/");
-      path = path[path.length - 1];
-      path = new String(path).split(".");
-      path = new java.lang.String(path[0]);
-
-      var decoder = new java.net.URLDecoder();
-      path = decoder.decode(path, "UTF-8");
-      path = path.split("[\\s\\_\\-]");
-      
-      var builder = new java.lang.StringBuilder();
-      builder.append(path[0].substr(0, 1).toUpperCase());
-      builder.append(path[0].substr(1));
-      for(var i = 1, n = path.length; i < n; i++) {
-        builder.append(" ");
-        builder.append(path[i].substr(0, 1).toUpperCase());
-        builder.append(path[i].substr(1));
-      }
-      path = builder.toString();
-
-      title.add(path);
-      row.put("title", title);
-      
-      return row;
-    }
-    
   ]]></script>
 
   <dataSource name="web" type="URLDataSource" />
-  <dataSource name="db" type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/dectris_contao"
-    user="contao" password="$Dectris2012Contao$" />
+  <dataSource name="db" type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/ct2113"
+    user="root" password="" />
   <dataSource name="fieldStream" type="FieldStreamDataSource" />
   <dataSource name="fieldReader" type="FieldReaderDataSource" />
 
@@ -97,7 +66,7 @@
 	                  s.root AS m_root_i,
 	                  s.request AS m_request_s,
                       s.base AS m_base_s,
-	                  IF(LENGTH(p.pageTitle) != 0, p.pageTitle, p.title) AS title,
+	                  p.pageTitle AS title,
 	                  p.language AS m_language_s
 	          FROM    tl_bbit_solr_page AS s
 	          JOIN    tl_page AS p ON p.id = s.page
@@ -127,7 +96,7 @@
 <!--               <field column="ignore_base" xpath="//base" /> -->
               
               <entity name="images2" processor="XPathEntityProcessor" dataSource="fieldReader"
-                dataField="tagsoup2.text" xsl="images.xsl" forEach="/images/image" transformer="TemplateTransformer,script:addTitleFromPath">
+                dataField="tagsoup2.text" xsl="images.xsl" forEach="/images/image" transformer="TemplateTransformer">
                 <field column="m_doctype_s" template="SolrImageDocument" />
 <!--                 <field column="m_base_s" template="${index.ignore_base}" /> -->
                 <field column="m_src_s" xpath="//img/@src" />
