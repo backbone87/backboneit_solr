@@ -43,7 +43,7 @@ class SolrGenericRequestHandler implements SolrRequestHandler {
 	}
 	
 	public function createQuery($strClass = null) {
-		if(strlen($strClass) && !$this->isQueryClass($strClass)) {
+		if(strlen($strClass) && !$this->hasQueryClass($strClass)) {
 			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 		}
 		return $this->objQueryClass->newInstance($this);
