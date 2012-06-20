@@ -121,9 +121,7 @@ class SolrFileSource extends SolrAbstractSource {
 		if($this->arrExtension && !isset($this->arrExtension[$arrInfo['extension']])) {
 			return;
 		}
-		if(DIRECTORY_SEPARATOR != '/') {
-			$strFile = str_replace(DIRECTORY_SEPARATOR, '/', $strFile);
-		}
+		$strFile = implode('/', array_map('rawurlencode', explode(DIRECTORY_SEPARATOR, $strFile)));
 		$arrFiles['SolrFileDocument,' . $strFile] = true;
 	}
 	
