@@ -64,7 +64,6 @@ $GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES']['bbit_solr_file_pdf'] = array(
 	'config' => array(
 // 		array('setRoots', 'tl_files'),
 		array('setExtension', 'pdf'),
-		array('setBase', 'http://localhost/ct/ct2113/'),
 	)
 );
 
