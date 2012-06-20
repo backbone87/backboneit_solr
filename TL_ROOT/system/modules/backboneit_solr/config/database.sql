@@ -10,11 +10,13 @@
 CREATE TABLE `tl_bbit_solr_page` (
 
   `page` int(10) unsigned NOT NULL default '0',
-  `url` varchar(1024) NOT NULL default '',
+  `hash` char(32) NOT NULL default '',
+  `base` varchar(1024) NOT NULL default '',
+  `request` varchar(1024) NOT NULL default '',
   `root` int(10) unsigned NOT NULL default '0',
   `tstamp` int(10) unsigned NOT NULL default '0',
   
-  PRIMARY KEY  (`page`, `url`(54)),
+  PRIMARY KEY  (`page`, `hash`),
   KEY `tstamp` (`tstamp`),
   
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
