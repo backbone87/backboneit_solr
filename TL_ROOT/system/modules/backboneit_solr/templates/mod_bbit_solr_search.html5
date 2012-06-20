@@ -1,28 +1,33 @@
 <!-- indexer::stop -->
-<section class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
 <?php if ($this->headline): ?>
 <<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
 <?php endif; ?>
 
 <form action="<?php echo $this->action; ?>" method="get">
+<?php if($this->targetValue): ?>
+<input type="hidden" name="<?php echo $this->targetName; ?>" value="<?php echo $this->targetValue; ?>" />
+<?php endif; ?>
 
-<input class="query" type="text" autocomplete="off"
+<div class="query"><input type="text" autocomplete="<?php echo $this->queryAutocomplete; ?>"
 	id="<?php echo $this->queryID; ?>" name="<?php echo $this->queryName; ?>"
-	value="<?php echo $this->queryValue; ?>" />
-<input class="submit" type="submit" value="<?php echo $GLOBALS['TL_LANG']['MSC']['search']; ?>" />
+	value="<?php echo $this->queryValue; ?>" /></div>
+
+<div class="submit"><input type="submit"
+	value="<?php echo $GLOBALS['TL_LANG']['MSC']['search']; ?>" /></div>
 
 </form>
 
-<?php if($this->result): ?>
-<div class="result"><pre>
-<?php echo print_r($this->result); ?>
-</pre></div>
-<?php endif; ?>
-
+<?php if(false && $this->liveTargetID): ?>
 <script>
 window.addEvent("domready", function() {
+	new bbit.solr.LiveSearch(
+		<?php echo json_encode($this->queryID); ?>,
+		<?php echo json_encode($this->liveTargetID); ?>
+	);
 });
 </script>
+<?php endif; ?>
 
-</section>
+</div>
 <!-- indexer::continue -->

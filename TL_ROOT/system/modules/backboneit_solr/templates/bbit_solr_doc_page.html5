@@ -1,4 +1,4 @@
-<div class="SolrDocument">
+<div class="SolrContaoPageDocument">
 <p class="title"><a href="<?php echo $this->getURL(); ?>"
 	title="<?php echo $this->getTitles(' - '); ?>"
 	><?php echo $this->getTitles(' - '); ?></a></p>

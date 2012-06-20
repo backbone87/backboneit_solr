@@ -1,1 +1,9 @@
-<?php
+<div class="SolrFileDocument">
+<p class="file"><a href="<?php echo $this->href; ?>" title="<?php echo $this->getTitles(' - '); ?>"
+	><img src="<?php echo $this->icon; ?>" width="18" height="18"
+		alt="<?php echo $this->file->mime; ?>" class="mime_icon"
+	> <span class="title"><?php echo $this->getTitles(' - '); ?></span
+	> <span class="size">(<?php echo $this->filesize; ?>)</span
+	></a></p>
+
+</div>
