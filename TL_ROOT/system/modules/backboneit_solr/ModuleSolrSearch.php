@@ -15,40 +15,49 @@ class ModuleSolrSearch extends Module {
 	}
 	
 	protected function compile() {
-		$objPage = $GLOBALS['objPage'];
-		$strQuery = $this->Input->get('query');
+		$objPage = $this->jumpTo ? $this->getPageDetails($this->jumpTo) : $GLOBALS['objPage'];
+		$strQuery = $this->Input->get('q');
 		
 		$this->Template->action = $this->generateFrontendUrl($objPage->row());
-		$this->Template->queryID = 'bbit_solr_search' . $this->id;
-		$this->Template->queryName = 'query';
-		$this->Template->queryValue = $strQuery;
 		
-		if($strQuery) {
-			$objIndex = SolrIndexManager::findIndex($this->bbit_solr_index);
-			if(!$objIndex) {
-				var_dump("shit");
-				return;
-			}
-			$objHandler = $objIndex->getRequestHandler($this->bbit_solr_handler);
-			if(!$objHandler
-			|| ($objHandler->getQueryClass()->getName() != 'SolrSearchQuery'
-			&& !$objHandler->getQueryClass()->isSubclassOf('SolrSearchQuery'))
-			) {
-				var_dump("shit2");
-				return;
-			}
-			$objQuery = $objHandler->createQuery();
-			$objQuery->setParam('q', $strQuery);
-			if(!$objQuery->execute()) {
-				var_dump("shit3");
-				return;
-			}
-			$this->Template->result = $objQuery->getResult()->getContent();
+		$this->Template->queryID = 'bbit_solr_search' . $this->id;
+		$this->Template->queryName = 'q';
+		$this->Template->queryValue = $this->bbit_solr_rememberQuery ? $strQuery : '';
+		$this->Template->queryAutocomplete = $this->bbit_solr_autocomplete ? 'on' : 'off';
+		
+		$this->Template->targetName = 't';
+		$this->Template->targetValue = $this->bbit_solr_target;
+		
+		if($this->bbit_solr_live) {
+			$this->Template->liveTargetID = $this->getResultModuleCSSID($this->bbit_solr_liveTarget);
 		}
+	}
+	
+	protected function getResultModuleCSSID($intModuleID) {
+		$this->import('Database');
+		$objModule = $this->Database->prepare(
+			'SELECT	cssID
+			FROM	tl_module
+			WHERE	id = ?'
+		)->execute($intModuleID);
+		
+		if(!$objModule->numRows) {
+			return false;
+		}
+		
+		list($strID) = deserialize($objModule->cssID, true);
+		return strlen($strID) ? $strID : 'bbit_solr_result' . $intModuleID;
 	}
 
 	protected function generateBE() {
-		return '### Solr search ###';
+		$objTemplate = new BackendTemplate('be_wildcard');
+
+		$objTemplate->wildcard = sprintf('### %s ###', $GLOBALS['TL_LANG']['FMD']['bbit_solr_search'][0]);
+		$objTemplate->title = $this->headline;
+		$objTemplate->id = $this->id;
+		$objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
+
+		return $objTemplate->parse();
 	}
 	
 }
