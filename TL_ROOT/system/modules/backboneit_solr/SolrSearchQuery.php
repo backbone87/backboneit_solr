@@ -7,7 +7,7 @@ class SolrSearchQuery extends SolrAbstractQuery {
 	}
 	
 	protected function createResult(RequestExtended $objRequest) {
-		return new SolrJSONResult($objRequest->response);
+		return new SolrSearchResult($objRequest->response);
 	}
 	
 }
