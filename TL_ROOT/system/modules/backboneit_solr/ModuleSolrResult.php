@@ -8,7 +8,8 @@ class ModuleSolrResult extends AbstractModuleSolr {
 		$strHTML = parent::generate($GLOBALS['TL_LANG']['FMD']['bbit_solr_result'][0]);
 		if(TL_MODE == 'FE' && $_GET['l'] == 1) {
 			while(ob_end_clean());
-			echo $strHTML;
+			$objTemplate = new BlankFrontendTemplate($strHTML);
+			$objTemplate->output();
 			exit;
 		} else {
 			return $strHTML;
