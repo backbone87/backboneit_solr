@@ -18,13 +18,16 @@
 
 </form>
 
-<?php if(false && $this->liveTargetID): ?>
+<?php if($this->live): ?>
 <script>
 window.addEvent("domready", function() {
-	new bbit.solr.LiveSearch(
+	var ls = new bbit.solr.LiveSearch(
 		<?php echo json_encode($this->queryID); ?>,
-		<?php echo json_encode($this->liveTargetID); ?>
+		<?php echo json_encode($this->liveTargetID); ?>,
+		<?php echo json_encode($this->liveTargetModule); ?>/*,
+		<?php echo json_encode($this->liveOptions); ?>*/
 	);
+	ls.activate();
 });
 </script>
 <?php endif; ?>
