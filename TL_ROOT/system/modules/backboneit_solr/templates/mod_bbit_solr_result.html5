@@ -10,7 +10,7 @@
 <?php echo $this->alternate; ?>
 
 <?php elseif($this->result): ?>
-<p class="numResult"><?php echo sprintf($GLOBALS['TL_LANG']['MSC']['bbit_solr_result'], $this->query, $this->result->count()); ?></p>
+<p class="numResult"><?php echo sprintf($GLOBALS['TL_LANG']['MSC']['bbit_solr_result'], $this->query, $this->result->getNumFound()); ?></p>
 <ul class="results">
 <?php $n = $this->result->count(); foreach($this->result as $i => $objDoc): ?>
 <li class="<?php echo $i % 2 ? 'even' : 'odd'; if($i == 0) echo 'first'; if($i - 1 == $n) echo 'last'; ?>">
@@ -18,7 +18,11 @@
 </li>
 <?php endforeach; ?>
 </ul>
-<pre><?php echo print_r($this->result->getContent()); ?></pre>
+<?php
+	$objPagination = new Pagination(min($this->maxResults, $this->result->getNumFound()), $this->perPage);
+	echo $objPagination->generate("\n  ");
+?>
+<pre><?php //echo print_r($this->result->getContent()); ?></pre>
 
 <?php elseif($this->exception): ?>
 <pre><?php echo $this->exception->getMessage(), "\n", $this->exception->getTraceAsString(); ?></pre>

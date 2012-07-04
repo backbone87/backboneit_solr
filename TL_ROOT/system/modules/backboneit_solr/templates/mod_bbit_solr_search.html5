@@ -13,6 +13,29 @@
 	id="<?php echo $this->queryID; ?>" name="<?php echo $this->queryName; ?>"
 	value="<?php echo $this->queryValue; ?>" /></div>
 
+<?php if($this->filter): ?>
+<div class="filter">
+	<span class="all"
+		><input type="radio"
+			id="<?php echo $this->filterID; ?>all" name="<?php echo $this->filterName; ?>"
+			value=""
+			<?php if($this->filterChecked == 'all'): ?>checked="checked"<?php endif; ?>
+		/><label for="<?php echo $this->filterID; ?>all"
+		><?php echo $GLOBALS['TL_LANG']['MSC']['bbit_solr_all']; ?></label
+	></span>
+	<?php foreach($this->filter as $strDocType => $dummy): ?>
+		<span class="<?php echo $strDocType; ?>"
+			><input type="radio"
+				id="<?php echo $this->filterID, $strDocType; ?>" name="<?php echo $this->filterName; ?>"
+				value="<?php echo $strDocType; ?>"
+				<?php if($this->filterChecked == $strDocType): ?>checked="checked"<?php endif; ?>
+			/><label for="<?php echo $this->filterID, $strDocType; ?>"
+			><?php echo $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType]; ?></label
+		></span>
+	<?php endforeach; ?>
+</div>
+<?php endif; ?>
+	
 <div class="submit"><input type="submit"
 	value="<?php echo $GLOBALS['TL_LANG']['MSC']['search']; ?>" /></div>
 

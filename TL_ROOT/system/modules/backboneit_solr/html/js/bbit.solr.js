@@ -8,13 +8,13 @@ var LiveSearch = {},
 	UPDATING_RESULT_CLASS = "updating";
 
 LiveSearch.Implements = [ Options, Events, Class.Occlude ];
-LiveSearch.Binds = [ "onKeyUp", "onFocus", "onBlur", "onSubmit", "search" ];
+LiveSearch.Binds = [ "onKeyUp", "onFocus", "onBlur", "onSubmit", "onClick", "onChange", "search", "setResult" ];
 LiveSearch.options = {
 	delay: 100,
 	disableFormSubmit: true,
 };
 LiveSearch.initialize = function(input, target, targetModule, options) {
-	var self = this;
+	var self = this, addUpdating, removeUpdating;
 	
 	self.input = input = $(input);
 	if(!input) return;
@@ -23,34 +23,31 @@ LiveSearch.initialize = function(input, target, targetModule, options) {
 	
 	if(self.occlude("bbit.solr.LiveSearch", self.input)) return self.occluded;
 
-	self.target = target = $(target);
+	target = $(target);
 	if(!target) return;
+	self.holder = new Element("div").wraps(target);
 	
 	if(!targetModule.toInt) return;
-	targetModule = targetModule.toInt();
-	if(targetModule < 1) return;
+	self.targetModule = targetModule.toInt();
+	if(self.targetModule < 1) return;
 	
 	self.valid = true;
 	self.setOptions(options);
 	self.form = input.getParent("form");
 	self.block = input.getParent(".block");
-	addUpdating = function() { if(self.target) self.target.addClass(UPDATING_RESULT_CLASS); };
-	removeUpdating = function() { if(self.target) self.target.removeClass(UPDATING_RESULT_CLASS); };
+	addUpdating = self.holder.addClass.pass(UPDATING_RESULT_CLASS, self.holder);
+	removeUpdating = self.holder.removeClass.pass(UPDATING_RESULT_CLASS, self.holder);
 	self.request = new Request({
 		url: window.location.href,
-		data: { t: targetModule, l: 1 },
 		method: "get",
-		timeout: 1500,
+//		timeout: 1500,
 		link: "cancel",
 		onRequest: addUpdating,
 		onTimeout: removeUpdating,
 		onComplete: removeUpdating,
 		onCancel: removeUpdating,
 		onException: removeUpdating,
-		onSuccess: function(html) {
-			html = Elements.from(html);
-			if(html.length) self.setResult(self.requestValue, html[0]);
-		}
+		onSuccess: self.setResult
 	});
 };
 LiveSearch.activate = function() {
@@ -60,77 +57,104 @@ LiveSearch.activate = function() {
 	self.input.addEvent("keyup", self.onKeyUp);
 	self.input.addEvent("focus", self.onFocus);
 	self.input.addEvent("blur", self.onBlur);
+
+	self.holder.addEvent("click:relay(.pagination a)", self.onClick);
 	
-	if(self.form && self.options.disableFormSubmit) self.form.addEvent("submit", self.onSubmit);
+	if(self.form) {
+		self.form.addEvent("change", self.onChange);
+		if(self.options.disableFormSubmit) self.form.addEvent("submit", self.onSubmit);
+	}
 	
-	self.isNewValue();
+	self.fetchInput();
+	self.holder.removeClass(FOCUS_RESULT_CLASS);
 };
 LiveSearch.deactivate = function() {
 	var self = this;
 	if(!self.valid) return;
 	
-	clearTimeout(self.reqTimer);
+	clearTimeout(self.keyIdleTimer);
 
 	self.input.removeEvent("keyup", self.onKeyUp);
 	self.input.removeEvent("focus", self.onFocus);
 	self.input.removeEvent("blur", self.onBlur);
 	
-	if(self.form) self.form.removeEvent("submit", self.onSubmit);
+	self.holder.removeEvent("click:relay(.pagination a)", self.onClick);
+	
+	if(self.form) {
+		self.form.removeEvent("change", self.onChange);
+		self.form.removeEvent("submit", self.onSubmit);
+	}
+	
+	self.holder.removeClass(FOCUS_RESULT_CLASS);
 };
 LiveSearch.onSubmit = function(event) {
 	event.preventDefault();
 };
 LiveSearch.onKeyUp = function() {
-	this.checkValue(this.options.delay);
+	var self = this;
+	clearTimeout(self.keyIdleTimer);
+	self.keyIdleTimer = setTimeout(self.search, self.options.delay);
 };
 LiveSearch.onFocus = function() {
 	var self = this;
 	clearTimeout(self.focusTimer);
+	clearTimeout(self.keyIdleTimer);
 	self.focus = true;
-	if(self.target) self.target.addClass(FOCUS_RESULT_CLASS);
-	self.checkValue(0);
+	self.holder.addClass(FOCUS_RESULT_CLASS);
+	self.search();
 };
 LiveSearch.onBlur = function() {
 	var self = this;
 	clearTimeout(self.focusTimer);
+	clearTimeout(self.keyIdleTimer);
 	self.focus = undef;
-	if(self.target) self.focusTimer = self.target.removeClass.delay(150, self.target, FOCUS_RESULT_CLASS);
-	self.checkValue(0);
+	self.focusTimer = self.holder.removeClass.delay(150, self.holder, FOCUS_RESULT_CLASS);
+	self.search();
 };
-LiveSearch.checkValue = function(delay) {
+LiveSearch.onClick = function(event, relay) {
+	var self = this, url = relay.get("href");
+	clearTimeout(self.keyIdleTimer);
+	event.preventDefault();
+	self.search(new URI(url).get("data"));
+};
+LiveSearch.onChange = function() {
 	var self = this;
-	clearTimeout(self.reqTimer);
-	if(!self.isNewValue()) return;
-	self.reqTimer = setTimeout(self.search, delay);
-};
-LiveSearch.isNewValue = function() {
-	var self = this, value = self.getInputValue(), isNew = value != self.value;
-	self.value = value;
-	return isNew;
+	clearTimeout(self.keyIdleTimer);
+	self.search();
 };
 LiveSearch.getInputValue = function() {
 	return this.input.get("value").clean().toLowerCase();
 };
-LiveSearch.search = function() {
-	var self = this;
-	if(!self.value) return;
-	self.request.options.data.q = self.requestValue = self.value;
-	self.request.send();
+LiveSearch.search = function(query) {
+	var self = this, options = {};
+	if(!query) query = self.fetchInput();
+	if(!self.isNew(query)) return;
+	
+	options.data = query;
+	self.request.send(options);
 };
-LiveSearch.setResult = function(value, result) {
-	result = $(result);
-	if(!result) return;
+LiveSearch.fetchInput = function() {
+	var self = this,
+		form = self.form || self.input,
+		query = form.toQueryString().parseQueryString();
+	query.q = self.getInputValue();
+	query.t = self.targetModule;
+	query.l = 1;
+	return query;
+};
+LiveSearch.isNew = function(query) {
+	var self = this, qs = Object.toQueryString(query);
 	
+	if(qs == self.qs) return undef;
+
+	self.query = query;
+	self.qs = qs;
+	return true;
+};
+LiveSearch.setResult = function(html) {
 	var self = this;
-	
-	if(self.target) result.replaces(self.target);
-	else if(self.block) result.inject(self.block, "after");
-	else result.inject(self.input, "after");
-	
-	if(self.focus) result.addClass(FOCUS_RESULT_CLASS);
-	
-	self.targetValue = value;
-	self.target = result;
+	self.holder.set("html", html);
+	self.holderQuery = self.request.options.data;
 };
 
 bbit.solr.LiveSearch = new Class(LiveSearch);

@@ -5,7 +5,8 @@ class ModuleSolrResult extends AbstractModuleSolr {
 	const DEFAULT_TEMPLATE = 'mod_bbit_solr_result';
 	
 	public function generate() {
-		$strHTML = parent::generate($GLOBALS['TL_LANG']['FMD']['bbit_solr_result'][0]);
+		$this->strDisplayName = $GLOBALS['TL_LANG']['FMD']['bbit_solr_result'][0];
+		$strHTML = parent::generate();
 		if(TL_MODE == 'FE' && $_GET['l'] == 1) {
 			while(ob_end_clean());
 			$objTemplate = new BlankFrontendTemplate($strHTML);
@@ -33,7 +34,22 @@ class ModuleSolrResult extends AbstractModuleSolr {
 			)->createQuery(
 				'SolrSearchQuery'
 			);
+			
 			$objQuery->setParam('q', $strQuery);
+			
+			$strFilter = deserialize($this->bbit_solr_docTypes, true);
+			$strFilter = $strFilter ? '+(' . implode(' OR ', $strFilter) . ')' : '';
+			$strUserFilter = $this->Input->get('f');
+			if($strUserFilter) {
+				$strUserFilter = '+"' . str_replace('"', '\\"', $strUserFilter) . '"';
+				$strFilter = $strFilter ? $strFilter . ' AND ' . $strUserFilter : $strUserFilter;
+			}
+			$strFilter && $objQuery->setParam('fq', 'm_doctype_s:(' . $strFilter . ')');
+			
+			$intPage = $this->Input->get('page');
+			$intPage || $intPage = 1;
+			$objQuery->setLimit($this->bbit_solr_perPage, $intPage - 1);
+			
 			$objResult = $objQuery->execute();
 
 		} catch(SolrException $e) {
@@ -62,6 +78,10 @@ class ModuleSolrResult extends AbstractModuleSolr {
 		$this->Template->content = true;
 		$this->Template->query = $strQuery;
 		$this->Template->result = $objResult;
+		$this->Template->perPage = $this->bbit_solr_perPage;
+		$this->Template->maxResults = $this->bbit_solr_maxPages
+			? $this->bbit_solr_maxPages * $this->bbit_solr_perPage
+			: PHP_INT_MAX;
 	}
 	
 }

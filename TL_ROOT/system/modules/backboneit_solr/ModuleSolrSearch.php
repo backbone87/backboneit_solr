@@ -5,7 +5,8 @@ class ModuleSolrSearch extends AbstractModuleSolr {
 	const DEFAULT_TEMPLATE = 'mod_bbit_solr_search';
 	
 	public function generate() {
-		return parent::generate($GLOBALS['TL_LANG']['FMD']['bbit_solr_search'][0]);
+		$this->strDisplayName = $GLOBALS['TL_LANG']['FMD']['bbit_solr_search'][0];
+		return parent::generate();
 	}
 	
 	protected function compile() {
@@ -21,6 +22,13 @@ class ModuleSolrSearch extends AbstractModuleSolr {
 		
 		$this->Template->targetName = 't';
 		$this->Template->targetValue = $this->bbit_solr_target;
+		
+		$this->Template->filter = $arrFilter = deserialize($this->bbit_solr_filter);
+		$arrFilter && $this->loadLanguageFile('bbit_solr');
+		$this->Template->filterID = 'f' . $this->id;
+		$this->Template->filterName = 'f';
+		$strChecked = $this->Input->get('f');
+		$this->Template->filterChecked = isset($arrFilter[$strChecked]) ? $strChecked : 'all';
 		
 		if($this->bbit_solr_live) {
 			$GLOBALS['TL_JAVASCRIPT']['bbit.solr.js'] = 'system/modules/backboneit_solr/html/js/bbit.solr.js';

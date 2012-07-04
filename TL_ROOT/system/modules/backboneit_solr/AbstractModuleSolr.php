@@ -4,9 +4,11 @@ abstract class AbstractModuleSolr extends Module {
 
 	const DEFAULT_TEMPLATE = 'mod_bbit_solr_search';
 	
-	public function generate($strName = 'bbit_solr') {
+	protected $strDisplayName = 'bbit_solr';
+	
+	public function generate() {
 		if(TL_MODE == 'BE') {
-			return $this->generateBE($strName);
+			return $this->generateBE($this->strDisplayName);
 		}
 		
 		$this->setTemplate($this->bbit_solr_tpl ? $this->bbit_solr_tpl : $this::DEFAULT_TEMPLATE);
@@ -30,10 +32,10 @@ abstract class AbstractModuleSolr extends Module {
 		return $strName . ($intID === null ? $this->id : $intID);
 	}
 
-	protected function generateBE($strName) {
+	protected function generateBE($strDisplayName) {
 		$objTemplate = new BackendTemplate('be_wildcard');
 
-		$objTemplate->wildcard = sprintf('### %s ###', $strName);
+		$objTemplate->wildcard = sprintf('### %s ###', $strDisplayName);
 		$objTemplate->title = $this->headline;
 		$objTemplate->id = $this->id;
 		$objTemplate->href = 'contao/main.php?do=themes&amp;table=tl_module&amp;act=edit&amp;id=' . $this->id;
