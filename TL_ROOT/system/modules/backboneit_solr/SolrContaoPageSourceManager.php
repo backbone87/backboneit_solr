@@ -19,9 +19,9 @@ final class SolrContaoPageSourceManager extends Controller {
 	protected function __clone() {
 	}
 	
-	public function hookOutputFrontendTemplate() {
+	public function hookOutputFrontendTemplate($strBuffer) {
 		if(!isset($GLOBALS['objPage'])) {
-			return;
+			return $strBuffer;
 		}
 		
 		$intTime = time();
@@ -52,6 +52,8 @@ final class SolrContaoPageSourceManager extends Controller {
 				'tstamp' => $intTime
 			))->execute();
 		}
+		
+		return $strBuffer;
 	}
 	
 	public function deleteInvalid() {
