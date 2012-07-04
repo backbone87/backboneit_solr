@@ -43,6 +43,16 @@
       return row;
     }
     
+    
+    function removeBase(row, ctx) {
+      var src = new String(row.get("m_src_s")), base = new String(row.get("m_base_s"));
+      if(src.length && base.length && src.indexOf(base) == 0) {
+        src = src.substr(base.length);
+        row.put("m_src_s", src);
+      }
+      return row;
+    }
+    
      
     function addTitleFromPath(row, ctx) {
       //var title = new java.util.ArrayList();
@@ -107,39 +117,35 @@
               AND     0 != LOCATE(p.alias, s.request)
         " transformer="TemplateTransformer">
 
+
+
         <entity name="fetch" rootEntity="false" processor="PlainTextEntityProcessor" dataSource="web"
           url="${index.m_base_s}${index.m_request_s}" transformer="script:stripNonIndexed">
 
           <entity name="page" processor="TikaEntityProcessor" dataSource="fieldStream" dataField="fetch.plainText"
             transformer="TemplateTransformer">
             <field column="m_doctype_s" template="SolrContaoPageDocument" />
-<!--             <field column="m_base_s" template="${index.ignore_base}" /> -->
-<!--             <field column="m_request_s" template="${index.ignore_request}" /> -->
             <field column="text" name="text" />
             <field column="id" template="${index.m_base_s}${index.m_request_s}" />
           </entity>
           
-          <entity name="tagsoup2" rootEntity="false" processor="TikaEntityProcessor" dataSource="fieldStream"
+          <entity name="tagsoup" rootEntity="false" processor="TikaEntityProcessor" dataSource="fieldStream"
             dataField="fetch.plainText" format="xml">
             
-<!--             <entity name="base2" rootEntity="false" processor="XPathEntityProcessor" dataSource="fieldReader" -->
-<!--               dataField="tagsoup2.text" xsl="images.xsl" forEach="/images"> -->
-<!--               <field column="ignore_base" xpath="//base" /> -->
-              
-              <entity name="images2" processor="XPathEntityProcessor" dataSource="fieldReader"
-                dataField="tagsoup2.text" xsl="images.xsl" forEach="/images/image" transformer="TemplateTransformer,script:addTitleFromPath">
+              <entity name="images" processor="XPathEntityProcessor" dataSource="fieldReader"
+                dataField="tagsoup.text" xsl="images.xsl" forEach="/images/image" transformer="TemplateTransformer,script:removeBase,script:addTitleFromPath">
                 <field column="m_doctype_s" template="SolrImageDocument" />
-<!--                 <field column="m_base_s" template="${index.ignore_base}" /> -->
-                <field column="m_src_s" xpath="//img/@src" />
+                <field column="m_base_s" template="${index.m_base_s}" />
+                <field column="m_src_s" xpath="//img/@src" /> <!-- this will be absolute becuase of TikeEntityProcessor with format "xml", remove base fixes this -->
                 <field column="title" xpath="//img/@alt" />
-                <field column="id" template="${index.m_base_s}${images2.m_src_s}" />
+                <field column="id" template="${images.m_src_s}" />
               </entity>
-              
-<!--             </entity> -->
             
           </entity>
 
         </entity>
+
+
 
       </entity>
 

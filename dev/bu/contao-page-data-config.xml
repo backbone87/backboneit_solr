@@ -66,7 +66,7 @@
 	                  s.root AS m_root_i,
 	                  s.request AS m_request_s,
                       s.base AS m_base_s,
-	                  p.pageTitle AS title,
+	                  IF(LENGTH(p.pageTitle) != 0, p.pageTitle, p.title) AS title,
 	                  p.language AS m_language_s
 	          FROM    tl_bbit_solr_page AS s
 	          JOIN    tl_page AS p ON p.id = s.page
