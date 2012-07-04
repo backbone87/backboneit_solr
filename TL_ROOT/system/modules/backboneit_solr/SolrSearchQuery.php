@@ -10,4 +10,9 @@ class SolrSearchQuery extends SolrAbstractQuery {
 		return new SolrSearchResult($objRequest->response);
 	}
 	
+	public function setLimit($intPerPage = 10, $intPage = 0) {
+		$this->setParam('rows', $intPerPage);
+		$this->setParam('start', $intPage * $intPerPage);
+	}
+	
 }
