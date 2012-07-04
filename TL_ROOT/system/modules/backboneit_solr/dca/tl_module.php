@@ -5,7 +5,7 @@ SolrUtils::getInstance()->loadLanguageFile('bbit_solr');
 /*** COMMON FIELDS ***/
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_tpl'] = array(
-	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_gs_tpl'],
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_tpl'],
 	'exclude'		=> true,
 	'inputType'		=> 'select',
 	'options_callback'=> array('SolrUtils', 'getTplOptions'),
@@ -25,7 +25,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['__selector__'][] = 'bbit_solr_live'
 $GLOBALS['TL_DCA']['tl_module']['palettes']['bbit_solr_search']
 	= '{title_legend},name,headline,type'
 	. ';{bbit_solr_search_legend}'
-	. ',bbit_solr_rememberQuery,bbit_solr_autocomplete'
+	. ',bbit_solr_rememberQuery,bbit_solr_autocomplete,'
+	. ',bbit_solr_filter'
 	. ';{redirect_legend}'
 	. ',bbit_solr_target'
 	. ',jumpTo'
@@ -56,6 +57,46 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_autocomplete'] = array(
 	'eval'			=> array(
 		'tl_class'		=> 'w50 cbx',
 	)
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_filter'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_filter'],
+	'inputType'		=> 'multiColumnWizard',
+	'eval'			=> array(
+		'columnFields' => array(
+			'label' => array(
+				'label'		=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_docLabel'],
+				'inputType'	=> 'text',
+				'eval'		=> array(
+					'readonly'	=> true,
+					'style'		=> 'width: 200px;'
+				)
+			),
+			'docType' => array(
+				'label'		=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_docType'],
+				'inputType'	=> 'text',
+				'eval'		=> array(
+					'readonly'	=> true,
+					'style'		=> 'width: 200px;'
+				)
+			),
+			'available' => array(
+				'label'		=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_available'],
+				'inputType'	=> 'checkbox',
+				'eval'		=> array(
+					'style'		=> 'width: 100px;'
+				)
+			),
+		),
+		'buttons'	=> array('delete' => false, 'copy' => false),
+	),
+	'load_callback' => array(
+		array('SolrUtils', 'loadFilter'),
+	),
+	'save_callback' => array(
+		array('SolrUtils', 'saveFilter'),
+	),
+	
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_target'] = array(
@@ -115,6 +156,7 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['bbit_solr_resultbbit_solr_nocopy']
 	. ';{bbit_solr_filter_legend}'
 	. ',bbit_solr_docTypes'
 	. ';{bbit_solr_tpl_legend}'
+	. ',bbit_solr_perPage,bbit_solr_maxPages'
 	. ',bbit_solr_tpl'
 	. ',bbit_solr_docTpls'
 	. ',bbit_solr_showOnEmpty'
@@ -201,6 +243,38 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_docTypes'] = array(
 		'size'			=> 5,
 		'style'			=> 'width: 100%',
 	)
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_perPage'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_perPage'],
+	'exclude'		=> true,
+	'inputType'		=> 'text',
+	'default'		=> 10,
+	'eval'			=> array(
+		'mandatory'		=> true,
+		'rgxp'			=> 'digit',
+		'nospace'		=> true,
+		'tl_class'		=> 'clr w50',
+	),
+	'save_callback' => array(
+		array('SolrUtils', 'savePositiveInteger'),
+	),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_maxPages'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_maxPages'],
+	'exclude'		=> true,
+	'inputType'		=> 'text',
+	'default'		=> 0,
+	'eval'			=> array(
+		'mandatory'		=> true,
+		'rgxp'			=> 'digit',
+		'nospace'		=> true,
+		'tl_class'		=> 'w50',
+	),
+	'save_callback' => array(
+		array('SolrUtils', 'saveNonNegativeInteger'),
+	),
 );
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_docTpls'] = array(

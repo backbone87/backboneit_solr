@@ -28,6 +28,7 @@ CREATE TABLE `tl_module` (
 	
   `bbit_solr_rememberQuery` char(1) NOT NULL default '',
   `bbit_solr_autocomplete` char(1) NOT NULL default '',
+  `bbit_solr_filter` blob NULL,
   `bbit_solr_target` int(10) unsigned NOT NULL default '0',
   `bbit_solr_live` char(1) NOT NULL default '',
   `bbit_solr_liveTarget` int(10) unsigned NOT NULL default '0',
@@ -37,6 +38,8 @@ CREATE TABLE `tl_module` (
   `bbit_solr_handler` varchar(255) NOT NULL default '',
   `bbit_solr_sources` blob NULL,
   `bbit_solr_docTypes` blob NULL,
+  `bbit_solr_perPage` int(10) unsigned NOT NULL default '0',
+  `bbit_solr_maxPages` int(10) unsigned NOT NULL default '0',
   `bbit_solr_docTpls` blob NULL,
   `bbit_solr_showOnEmpty` char(1) NOT NULL default '',
   

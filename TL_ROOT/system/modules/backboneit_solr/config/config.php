@@ -67,6 +67,10 @@ $GLOBALS['SOLR_DEFAULT_SEARCH_SOURCES']['bbit_solr_file_pdf'] = array(
 	)
 );
 
+$GLOBALS['SOLR_DOCTYPES'][] = 'SolrContaoPageDocument';
+$GLOBALS['SOLR_DOCTYPES'][] = 'SolrFileDocument';
+$GLOBALS['SOLR_DOCTYPES'][] = 'SolrImageDocument';
+
 // add all factories for indexes and search sources to their respective managers
 // the managers are aggregation factories
 SolrIndexManager::getInstance()->add(SolrDefaultIndexFactory::getInstance());

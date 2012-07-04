@@ -58,6 +58,18 @@ final class SolrUtils extends Backend {
 		return $arrSources;
 	}
 	
+	public function getDocumentTypes() {
+		$arrTypes = array();
+		
+		foreach($GLOBALS['SOLR_DOCTYPES'] as $strDocType) {
+			$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
+			$arrTypes[$strDocType] = $strLabel ? $strLabel : $strDocType;
+		}
+		
+		asort($arrTypes);
+		return $arrTypes;
+	}
+	
 	public function getDocumentTypeOptionsByIndex($objDCA) {
 		$arrTypes = array();
 		try {
@@ -130,6 +142,39 @@ final class SolrUtils extends Backend {
 		}
 		
 		return $arrModules;
+	}
+	
+	public function loadFilter($varValue, $objDCA) {
+		$arrRows = array();
+		$arrFilter = deserialize($varValue, true);
+		
+		foreach($this->getDocumentTypes() as $strDocType => $strLabel) {
+			$arrRows[] = array(
+				'label' => $strLabel,
+				'available' => isset($arrFilter[$strDocType]),
+				'docType' => $strDocType,
+			);
+		}
+		
+		return array_values($arrRows);
+	}
+	
+	public function saveFilter($varValue) {
+		$arrFilter = array();
+		
+		foreach(deserialize($varValue, true) as $arrRow) if($arrRow['available']) {
+			$arrFilter[$arrRow['docType']] = true;
+		}
+		
+		return $arrFilter;
+	}
+	
+	public function savePositiveInteger($varValue) {
+		return max(1, intval($varValue));
+	}
+	
+	public function saveNonNegativeInteger($varValue) {
+		return max(0, intval($varValue));
 	}
 	
 	public function loadDocTpls($varValue, $objDCA) {
