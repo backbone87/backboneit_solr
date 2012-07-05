@@ -28,9 +28,13 @@ class SolrSearchQuery extends SolrAbstractQuery {
 	}
 	
 	public function setQuery($strQuery) {
+		$this->setParam('q', $strQuery);
+	}
+	
+	public function prepareQuery($strQuery, $blnFuzzy = true) {
 		$arrQuery = preg_split('/[\s\.\,\;\:\)\(\]\[\}\{_-]+/', $strQuery);
 		$arrQuery = array_filter($arrQuery, create_function('$str', 'return strlen($str) > 2;'));
-		$this->setParam('q', implode('~ ', $arrQuery) . '~');
+		return $arrQuery ? $blnFuzzy ? implode('~ ', $arrQuery) . '~' : implode(' ', $arrQuery) : '';
 	}
 	
 }

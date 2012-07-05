@@ -35,6 +35,10 @@ class ModuleSolrResult extends AbstractModuleSolr {
 				'SolrSearchQuery'
 			);
 			
+			$strQuery = $objQuery->prepareQuery($strQuery);
+			if(!strlen($strQuery)) {
+				return;
+			}
 			$objQuery->setQuery($strQuery);
 			
 			$arrFilter = deserialize($this->bbit_solr_docTypes, true);
