@@ -43,10 +43,10 @@ final class SolrUtils extends Backend {
 		return $arrOptions;
 	}
 	
-	public function getSourceOptionsByIndex($objDCA) {
+	public function getSourceOptionsByIndex($objDC) {
 		$arrSources = array();
 		try {
-			$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
+			$objIndex = SolrIndexManager::findIndex($objDC->activeRecord->bbit_solr_index);
 			foreach($objIndex->getSources() as $objSource) {
 				$arrSources[$objSource->getName()] = $objSource->getDisplayName();
 			}
@@ -58,26 +58,22 @@ final class SolrUtils extends Backend {
 		return $arrSources;
 	}
 	
-	public function getDocumentTypes() {
+	public function getDocumentTypeOptions() {
 		$arrTypes = array();
-		
 		foreach($GLOBALS['SOLR_DOCTYPES'] as $strDocType) {
-			$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
-			$arrTypes[$strDocType] = $strLabel ? $strLabel : $strDocType;
+			$arrTypes[$strDocType] = $this->getDocumentTypeLabel($strDocType);
 		}
-		
 		asort($arrTypes);
 		return $arrTypes;
 	}
 	
-	public function getDocumentTypeOptionsByIndex($objDCA) {
+	public function getDocumentTypeOptionsByIndex($objDC) {
 		$arrTypes = array();
 		try {
-			$objIndex = SolrIndexManager::findIndex($objDCA->activeRecord->bbit_solr_index);
+			$objIndex = SolrIndexManager::findIndex($objDC->activeRecord->bbit_solr_index);
 			foreach($objIndex->getSources() as $objSource) {
 				foreach($objSource->getDocumentTypes() as $strDocType) {
-					$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
-					$arrTypes[$strDocType] = $strLabel ? $strLabel : $strDocType;
+					$arrTypes[$strDocType] = $this->getDocumentTypeLabel($strDocType);
 				}
 			}
 			
@@ -86,6 +82,11 @@ final class SolrUtils extends Backend {
 		}
 		asort($arrTypes);
 		return $arrTypes;
+	}
+	
+	public function getDocumentTypeLabel($strDocType) {
+		$strLabel = $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType];
+		return $strLabel ? $strLabel : $strDocType;
 	}
 	
 	public function getTplOptions($objDC) {
@@ -128,13 +129,13 @@ final class SolrUtils extends Backend {
 		return $arrTpls;
 	}
 	
-	public function getResultModuleOptions($objDCA) {
+	public function getResultModuleOptions($objDC) {
 		$objResult = $this->Database->prepare(
 			'SELECT id, name FROM tl_module WHERE id != ? AND type = ? ORDER BY name'
-		)->execute($objDCA->activeRecord->id, 'bbit_solr_result');
+		)->execute($objDC->activeRecord->id, 'bbit_solr_result');
 		
 		$arrModules = array();
-		if($objDCA && $GLOBALS['TL_DCA']['tl_module']['fields'][$objDCA->field]['bbit_solr_nocopyOption']) {
+		if($objDC && $GLOBALS['TL_DCA']['tl_module']['fields'][$objDC->field]['bbit_solr_nocopyOption']) {
 			$arrModules['bbit_solr_nocopy'] = &$GLOBALS['TL_LANG']['bbit_solr']['nocopy'];
 		}
 		while($objResult->next()) {
@@ -144,29 +145,43 @@ final class SolrUtils extends Backend {
 		return $arrModules;
 	}
 	
-	public function loadFilter($varValue, $objDCA) {
-		$arrRows = array();
-		$arrFilter = deserialize($varValue, true);
+	public function loadGroups($varValue, $objDC) {
+		$arrGrouping = deserialize($varValue, true);
+		$arrDocTypes = $GLOBALS['TL_DCA'][$objDC->table]['fields'][$objDC->field]['bbit_solr_useIndexDocTypes']
+			? $this->getDocumentTypeOptionsByIndex($objDC)
+			: $this->getDocumentTypeOptions();
+		// filter unknown doctypes and apply user order
+		$arrDocTypes = array_merge(array_intersect_key($arrGrouping, $arrDocTypes), $arrDocTypes);
 		
-		foreach($this->getDocumentTypes() as $strDocType => $strLabel) {
-			$arrRows[] = array(
+		$arrRows = array();
+		foreach($arrDocTypes as $strDocType => $strLabel) {
+			$arrRow = array(
 				'label' => $strLabel,
-				'available' => isset($arrFilter[$strDocType]),
 				'docType' => $strDocType,
 			);
+			if(isset($arrGrouping[$strDocType])) {
+				$arrRow['group'] = $arrGrouping[$strDocType] == $strGroup ? '' : $arrGrouping[$strDocType];
+				$arrRow['available'] = true;
+				$strGroup = $arrGrouping[$strDocType];
+			}
+			$arrRows[] = $arrRow;
 		}
 		
 		return array_values($arrRows);
 	}
 	
-	public function saveFilter($varValue) {
-		$arrFilter = array();
+	public function saveGroups($varValue, $objDC) {
+		$blnAll = !isset($GLOBALS['TL_DCA'][$objDC->table]['fields'][$objDC->field]['eval']['columnFields']['available']);
+		$arrGrouping = array();
 		
-		foreach(deserialize($varValue, true) as $arrRow) if($arrRow['available']) {
-			$arrFilter[$arrRow['docType']] = true;
+		foreach(deserialize($varValue, true) as $i => $arrRow) if($blnAll || $arrRow['available']) {
+			$strGroup = $arrRow['group']
+				? $arrRow['group']
+				: ($strGroup ? $strGroup : $this->getDocumentTypeLabel($arrRow['docType']));
+			$arrGrouping[$arrRow['docType']] = $strGroup;
 		}
 		
-		return $arrFilter;
+		return $arrGrouping;
 	}
 	
 	public function savePositiveInteger($varValue) {
@@ -177,10 +192,10 @@ final class SolrUtils extends Backend {
 		return max(0, intval($varValue));
 	}
 	
-	public function loadDocTpls($varValue, $objDCA) {
+	public function loadDocTpls($varValue, $objDC) {
 		$arrRows = array();
 		
-		foreach($this->getDocumentTypeOptionsByIndex($objDCA) as $strDocType => $strLabel) {
+		foreach($this->getDocumentTypeOptionsByIndex($objDC) as $strDocType => $strLabel) {
 			$arrRows[$strDocType] = array('docType' => $strDocType, 'label' => $strLabel);
 		}
 		

@@ -40,6 +40,7 @@ CREATE TABLE `tl_module` (
   `bbit_solr_docTypes` blob NULL,
   `bbit_solr_perPage` int(10) unsigned NOT NULL default '0',
   `bbit_solr_maxPages` int(10) unsigned NOT NULL default '0',
+  `bbit_solr_grouping` blob NULL,
   `bbit_solr_docTpls` blob NULL,
   `bbit_solr_showOnEmpty` char(1) NOT NULL default '',
   
