@@ -10,5 +10,3 @@ $GLOBALS['TL_LANG']['bbit_solr']['source']['bbit_solr_file_pdf'] = 'PDF Dateien'
 $GLOBALS['TL_LANG']['bbit_solr']['docTypes']['SolrContaoPageDocument'] = 'Seiten';
 $GLOBALS['TL_LANG']['bbit_solr']['docTypes']['SolrFileDocument'] = 'Dateien';
 $GLOBALS['TL_LANG']['bbit_solr']['docTypes']['SolrImageDocument'] = 'Bilder';
-
-$GLOBALS['TL_LANG']['bbit_solr']['nocopy'] = 'Keine Einstellungen kopieren';

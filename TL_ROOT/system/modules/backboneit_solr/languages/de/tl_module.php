@@ -37,6 +37,8 @@ $GLOBALS['TL_LANG']['tl_module']['bbit_solr_liveTarget']
 
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_copy']
 	= array('Einstellungen übernehmen', 'Die Einstellungen eines anderen Moduls verwenden.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_nocopy']
+	= 'Keine Einstellungen kopieren';
 
 
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_source_legend']

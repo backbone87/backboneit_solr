@@ -136,7 +136,7 @@ final class SolrUtils extends Backend {
 		
 		$arrModules = array();
 		if($objDC && $GLOBALS['TL_DCA']['tl_module']['fields'][$objDC->field]['bbit_solr_nocopyOption']) {
-			$arrModules['bbit_solr_nocopy'] = &$GLOBALS['TL_LANG']['bbit_solr']['nocopy'];
+			$arrModules['bbit_solr_nocopy'] = &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_nocopy'];
 		}
 		while($objResult->next()) {
 			$arrModules[$objResult->id] = $objResult->name . ' (ID ' . $objResult->id . ')';
