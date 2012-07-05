@@ -8,9 +8,9 @@ var LiveSearch = {},
 	UPDATING_RESULT_CLASS = "updating";
 
 LiveSearch.Implements = [ Options, Events, Class.Occlude ];
-LiveSearch.Binds = [ "onKeyUp", "onFocus", "onBlur", "onSubmit", "onClick", "onChange", "search", "setResult" ];
+LiveSearch.Binds = [ "onKeyUp", "onFocus", "onBlur", "onSubmit", "onClick", "onChange", "setResult" ];
 LiveSearch.options = {
-	delay: 100,
+	delay: 250,
 	disableFormSubmit: true,
 };
 LiveSearch.initialize = function(input, target, targetModule, options) {
@@ -33,6 +33,7 @@ LiveSearch.initialize = function(input, target, targetModule, options) {
 	
 	self.valid = true;
 	self.setOptions(options);
+	self.searchNoArgs = self.search.bind(self, []);
 	self.form = input.getParent("form");
 	self.block = input.getParent(".block");
 	addUpdating = self.holder.addClass.pass(UPDATING_RESULT_CLASS, self.holder);
@@ -93,7 +94,7 @@ LiveSearch.onSubmit = function(event) {
 LiveSearch.onKeyUp = function() {
 	var self = this;
 	clearTimeout(self.keyIdleTimer);
-	self.keyIdleTimer = setTimeout(self.search, self.options.delay);
+	self.keyIdleTimer = setTimeout(self.searchNoArgs, self.options.delay);
 };
 LiveSearch.onFocus = function() {
 	var self = this;
