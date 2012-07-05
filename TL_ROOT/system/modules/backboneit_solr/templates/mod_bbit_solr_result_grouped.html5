@@ -1,0 +1,57 @@
+<div id="<?php echo $this->id; ?>">
+<?php if($this->content): ?>
+<!-- indexer::stop -->
+<div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
+<?php if ($this->headline): ?>
+<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+<?php endif; ?>
+
+<?php if($this->alternate): ?>
+<?php echo $this->alternate; ?>
+
+<?php elseif($this->result): ?>
+<p class="numResult"><?php echo sprintf($GLOBALS['TL_LANG']['MSC']['bbit_solr_result'], $this->query, $this->result->getNumFound()); ?></p>
+<?php
+$arrGroups = array();
+$arrGrouping = deserialize($this->bbit_solr_grouping, true);
+foreach($arrGrouping as $strGroup) {
+	$arrGroups[$strGroup] = array();
+}
+foreach($this->result as $objDoc) {
+	$arrGroups[$arrGrouping[$objDoc->getType()]][] = $objDoc;
+}
+$arrGroups = array_filter($arrGroups);
+?>
+
+<ul class="results">
+
+<?php $j = -1; $m = count($arrGroups); foreach($arrGroups as $strGroup => $arrGroup): $j++; ?>
+<li class="group <?php echo $j % 2 ? 'even' : 'odd'; if($j == 0) echo 'first'; if($j - 1 == $m) echo 'last'; ?>">
+<h3><?php echo $strGroup; ?></h3>
+<ul>
+
+<?php $n = count($arrGroup); foreach($arrGroup as $i => $objDoc): ?>
+<li class="<?php echo $i % 2 ? 'even' : 'odd'; if($i == 0) echo 'first'; if($i - 1 == $n) echo 'last'; ?>">
+<?php echo $objDoc->parse(); ?>
+</li>
+<?php endforeach; ?>
+
+</ul>
+</li>
+<?php endforeach; ?>
+
+</ul>
+
+<?php
+	$objPagination = new Pagination(min($this->maxResults, $this->result->getNumFound()), $this->perPage);
+	echo $objPagination->generate("\n  ");
+?>
+
+<?php elseif($this->exception): ?>
+<pre><?php echo $this->exception->getMessage(), "\n", $this->exception->getTraceAsString(); ?></pre>
+
+<?php endif; ?>
+</div>
+<!-- indexer::continue -->
+<?php endif; ?>
+</div>

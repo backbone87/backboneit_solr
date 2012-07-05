@@ -35,16 +35,11 @@ class ModuleSolrResult extends AbstractModuleSolr {
 				'SolrSearchQuery'
 			);
 			
-			$objQuery->setParam('q', $strQuery);
+			$objQuery->setQuery($strQuery);
 			
-			$strFilter = deserialize($this->bbit_solr_docTypes, true);
-			$strFilter = $strFilter ? '+(' . implode(' OR ', $strFilter) . ')' : '';
-			$strUserFilter = $this->Input->get('f');
-			if($strUserFilter) {
-				$strUserFilter = '+"' . str_replace('"', '\\"', $strUserFilter) . '"';
-				$strFilter = $strFilter ? $strFilter . ' AND ' . $strUserFilter : $strUserFilter;
-			}
-			$strFilter && $objQuery->setParam('fq', 'm_doctype_s:(' . $strFilter . ')');
+			$arrFilter = deserialize($this->bbit_solr_docTypes, true);
+			$arrUserFilter = explode(',', strval($this->Input->get('f')));
+			$objQuery->setDocTypeFilter(true, $arrFilter, $arrUserFilter);
 			
 			$intPage = $this->Input->get('page');
 			$intPage || $intPage = 1;
@@ -59,7 +54,7 @@ class ModuleSolrResult extends AbstractModuleSolr {
 			return;
 		}
 		
-// 		var_dump($objResult);
+// 		var_dump($objResult->getContent());
 		if($objResult->isEmpty()) {
 			if($this->bbit_solr_showOnEmpty) {
 				$this->Template->content = true;
