@@ -10,6 +10,7 @@ class ModuleSolrSearch extends AbstractModuleSolr {
 	}
 	
 	protected function compile() {
+		$this->loadLanguageFile('bbit_solr');
 		$objPage = $this->jumpTo ? $this->getPageDetails($this->jumpTo) : $GLOBALS['objPage'];
 		$strQuery = $this->getQuery($this->bbit_solr_target);
 		
@@ -23,8 +24,14 @@ class ModuleSolrSearch extends AbstractModuleSolr {
 		$this->Template->targetName = 't';
 		$this->Template->targetValue = $this->bbit_solr_target;
 		
-		$this->Template->filter = $arrFilter = deserialize($this->bbit_solr_filter);
-		$arrFilter && $this->loadLanguageFile('bbit_solr');
+		$arrFilter = array();
+		foreach(deserialize($this->bbit_solr_filter) as $strDocType => $strGroup) {
+			$arrFilter[$strGroup][] = $strDocType;
+		}
+		foreach($arrFilter as &$arrDocTypes) {
+			$arrDocTypes = implode(',', $arrDocTypes);
+		}
+		$this->Template->filter = $arrFilter;
 		$this->Template->filterID = 'f' . $this->id;
 		$this->Template->filterName = 'f';
 		$strChecked = $this->Input->get('f');

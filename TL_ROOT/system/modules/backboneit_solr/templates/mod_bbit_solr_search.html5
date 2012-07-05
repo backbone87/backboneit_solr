@@ -23,14 +23,14 @@
 		/><label for="<?php echo $this->filterID; ?>all"
 		><?php echo $GLOBALS['TL_LANG']['MSC']['bbit_solr_all']; ?></label
 	></span>
-	<?php foreach($this->filter as $strDocType => $dummy): ?>
-		<span class="<?php echo $strDocType; ?>"
+	<?php $i = -1; foreach($this->filter as $strGroup => $strValue): $i++; ?>
+		<span class="group<?php echo $i; ?>"
 			><input type="radio"
-				id="<?php echo $this->filterID, $strDocType; ?>" name="<?php echo $this->filterName; ?>"
-				value="<?php echo $strDocType; ?>"
-				<?php if($this->filterChecked == $strDocType): ?>checked="checked"<?php endif; ?>
-			/><label for="<?php echo $this->filterID, $strDocType; ?>"
-			><?php echo $GLOBALS['TL_LANG']['bbit_solr']['docTypes'][$strDocType]; ?></label
+				id="<?php echo $this->filterID, '_group', $i; ?>" name="<?php echo $this->filterName; ?>"
+				value="<?php echo $strValue; ?>"
+				<?php if($this->filterChecked == $strValue): ?>checked="checked"<?php endif; ?>
+			/><label for="<?php echo $this->filterID, '_group', $i; ?>"
+			><?php echo $strGroup; ?></label
 		></span>
 	<?php endforeach; ?>
 </div>
