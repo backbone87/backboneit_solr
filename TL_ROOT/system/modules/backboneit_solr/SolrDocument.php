@@ -36,4 +36,8 @@ class SolrDocument extends Template {
 		}
 	}
 	
+	public function getType() {
+		return get_class($this);
+	}
+	
 }
