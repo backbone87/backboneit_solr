@@ -244,7 +244,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_prep'] = array(
 	'eval'			=> array(
 		'includeBlankOption'=> true,
 		'chosen'		=> true,
-		'tl_class'		=> 'clr w50',
+// 		'tl_class'		=> 'clr w50',
 	)
 );
 
