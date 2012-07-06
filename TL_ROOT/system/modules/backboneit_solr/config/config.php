@@ -9,13 +9,14 @@ $GLOBALS['BE_MOD']['system']['bbit_solr_index'] = array('callback' => 'ModuleSol
 
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('SolrContaoPageSourceManager', 'hookOutputFrontendTemplate');
 
-$GLOBALS['TL_CRON']['daily'][] = array('SolrContaoPageSourceManager', 'cleanURLIndex');
+// $GLOBALS['TL_CRON']['daily'][] = array('SolrContaoPageSourceManager', 'cleanURLIndex');
 $GLOBALS['TL_CRON']['daily'][] = array('SolrIndexManager', 'runUpdates');
 
 // $GLOBALS['BBIT_SOLR_HOOKS']['beforeRunUpdates'] = array('', '');
 // $GLOBALS['BBIT_SOLR_HOOKS']['afterRunUpdates'] = array('', '');
 // $GLOBALS['BBIT_SOLR_HOOKS']['beforeUpdate'] = array('', '');
 // $GLOBALS['BBIT_SOLR_HOOKS']['afterUpdate'] = array('', '');
+$GLOBALS['BBIT_SOLR_HOOKS']['beforeRunUpdates'] = array('SolrContaoPageSourceManager', 'cleanURLIndex');
 
 // default index config
 $GLOBALS['SOLR_DEFAULT_INDEX'] = array(
