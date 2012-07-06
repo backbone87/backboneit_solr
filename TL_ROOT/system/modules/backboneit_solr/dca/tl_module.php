@@ -164,7 +164,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['bbit_solr_resultbbit_solr_nocopy']
 	. ';{bbit_solr_source_legend}'
 	. ',bbit_solr_index,bbit_solr_handler'
 	. ',bbit_solr_sources'
-	. ';{bbit_solr_filter_legend}'
+	. ';{bbit_solr_search_legend}'
+	. ',bbit_solr_prep'
 	. ',bbit_solr_docTypes'
 	. ';{bbit_solr_tpl_legend}'
 	. ',bbit_solr_perPage,bbit_solr_maxPages'
@@ -229,16 +230,20 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_sources'] = array(
 		'multiple'		=> true,
 		'chosen'		=> true,
 		'size'			=> 5,
+// 		'tl_class'		=> 'clr',
 		'style'			=> 'width: 100%',
 	),
 );
 
-$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_showOnEmpty'] = array(
-	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_showOnEmpty'],
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_prep'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prep'],
 	'exclude'		=> true,
-	'inputType'		=> 'checkbox',
+	'inputType'		=> 'select',
+	'options'		=> array('fuzzy', 'wildcard_all', 'wildcard_last'),
+	'reference'		=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prepOptions'],
 	'eval'			=> array(
-		'submitOnChange'=> true,
+		'includeBlankOption'=> true,
+		'chosen'		=> true,
 		'tl_class'		=> 'clr w50',
 	)
 );
@@ -253,6 +258,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_docTypes'] = array(
 		'multiple'		=> true,
 		'chosen'		=> true,
 		'size'			=> 5,
+// 		'tl_class'		=> 'clr',
 		'style'			=> 'width: 100%',
 	)
 );
@@ -372,4 +378,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_docTpls'] = array(
 	'save_callback' => array(
 		array('SolrUtils', 'saveDocTpls'),
 	),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_showOnEmpty'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_showOnEmpty'],
+	'exclude'		=> true,
+	'inputType'		=> 'checkbox',
+	'eval'			=> array(
+		'submitOnChange'=> true,
+		'tl_class'		=> 'clr w50',
+	)
 );

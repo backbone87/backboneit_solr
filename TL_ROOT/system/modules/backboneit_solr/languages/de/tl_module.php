@@ -51,8 +51,15 @@ $GLOBALS['TL_LANG']['tl_module']['bbit_solr_sources']
 	= array('Suchquellen', 'Wählen Sie die Suchquellen aus, in denen gesucht werden soll.');
 
 
-$GLOBALS['TL_LANG']['tl_module']['bbit_solr_filter_legend']
-	= 'Filter-Einstellungen';
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_search_legend']
+	= 'Such-Einstellungen';
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prep']
+	= array('Anfrage Vorverarbeitung', 'Der Mechanismus der zur Vorverarbeitung der Suchanfrage verwendet werden soll.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prepOptions'] = array(
+	'fuzzy'	=> 'Ähnlichkeits-Suche',
+	'wildcard_all' => 'Platzhalter am Ende (alle Suchwörter)',
+	'wildcard_last' => 'Platzhalter am Ende (nur letztes Suchwort)',
+);
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_docTypes']
 	= array('Dokumenttypen-Filter', 'Wählen Sie die Dokumenttypen nach denen die Ergebnisse eingeschränkt werden sollen.');
 

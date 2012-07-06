@@ -50,8 +50,15 @@ $GLOBALS['TL_LANG']['tl_module']['bbit_solr_sources']
 	= array('Search sources', 'Choose the search sources that will be searched.');
 
 
-$GLOBALS['TL_LANG']['tl_module']['bbit_solr_filter_legend']
-	= 'Filter settings';
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_search_legend']
+	= 'Search settings';
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prep']
+	= array('Query Preparation', 'The mechanism to be used to prepare the query for search.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prepOptions'] = array(
+	'fuzzy'	=> 'Fuzzy search',
+	'wildcard_all' => 'Wildcard at the end (all keywords)',
+	'wildcard_last' => 'Wildcard at the end (only last keyword)',
+);
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_docTypes']
 	= array('Document type filter', 'Choose the document types the results will be limited to.');
 
