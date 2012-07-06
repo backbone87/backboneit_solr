@@ -8,4 +8,14 @@ class SolrContaoPageDocument extends SolrDocument {
 		parent::__construct();
 	}
 	
+	public function getURL($blnRelative = true) {
+		$strURL = parent::getURL($blnRelative);
+		$objQuery = $this->getQuery();
+		if($objQuery) {
+			$strCon = strpos($strURL, '?') === false ? '?' : '&';
+			$strURL .= $strCon . 'h=' . urlencode(implode(',', $objQuery->getKeywords()));
+		}
+		return $strURL;
+	}
+	
 }
