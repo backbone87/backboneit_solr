@@ -56,6 +56,19 @@ final class SolrContaoPageSourceManager extends Controller {
 		return $strBuffer;
 	}
 	
+	public function cleanURLIndex() {
+		$this->deleteOutdated();
+		$this->deleteInvalid();
+	}
+	
+	public function deleteOutdated() {
+		$this->Database->query(
+			'DELETE
+			FROM	tl_bbit_solr_page
+			WHERE	tstamp < ?'
+		)->execute(time() - max(60 * 60 * 24, intval($GLOBALS['TL_CONFIG']['bbit_solr_page_outdate'])));
+	}
+	
 	public function deleteInvalid() {
 		$this->Database->query(
 			'DELETE
@@ -66,9 +79,5 @@ final class SolrContaoPageSourceManager extends Controller {
 			OR		0 = LOCATE(p.alias, s.request)'
 		);
 	}
-	
-// 	public function addSearchablePages() {
-// 		SolrUtils::getInstance()->getSearchablePages();
-// 	}
 	
 }

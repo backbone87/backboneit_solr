@@ -1,5 +1,7 @@
 <?php
 
+$GLOBALS['TL_CONFIG']['bbit_solr_page_outdate'] = 60 * 60 * 24 * 30;
+
 $GLOBALS['FE_MOD']['application']['bbit_solr_search'] = 'ModuleSolrSearch';
 $GLOBALS['FE_MOD']['application']['bbit_solr_result'] = 'ModuleSolrResult';
 
@@ -7,7 +9,7 @@ $GLOBALS['BE_MOD']['system']['bbit_solr_index'] = array('callback' => 'ModuleSol
 
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('SolrContaoPageSourceManager', 'hookOutputFrontendTemplate');
 
-$GLOBALS['TL_CRON']['daily'][] = array('SolrContaoPageSourceManager', 'deleteInvalid');
+$GLOBALS['TL_CRON']['daily'][] = array('SolrContaoPageSourceManager', 'cleanURLIndex');
 $GLOBALS['TL_CRON']['daily'][] = array('SolrIndexManager', 'runUpdates');
 
 // $GLOBALS['BBIT_SOLR_HOOKS']['beforeRunUpdates'] = array('', '');
