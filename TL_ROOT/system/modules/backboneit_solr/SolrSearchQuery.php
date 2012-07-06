@@ -2,12 +2,17 @@
 
 class SolrSearchQuery extends SolrAbstractQuery {
 	
+	private $arrKeywords;
+	
 	public function __construct(SolrRequestHandler $objHandler) {
 		parent::__construct($objHandler);
 	}
 	
 	protected function createResult(RequestExtended $objRequest) {
-		return new SolrSearchResult($objRequest->response);
+		if($this->getWriterType() != self::WT_JSON) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		}
+		return new SolrSearchResult($this, $objRequest->response);
 	}
 	
 	public function setLimit($intPerPage = 10, $intPage = 0) {
@@ -27,14 +32,30 @@ class SolrSearchQuery extends SolrAbstractQuery {
 		$arrConjunction && $this->setParam('fq', 'm_doctype_s:(' . implode(' AND ', $arrConjunction) . ')');
 	}
 	
-	public function setQuery($strQuery) {
-		$this->setParam('q', $strQuery);
+	public function setQuery(array $arrKeywords, $strPrep = null) {
+		$this->arrKeywords = $arrKeywords;
+		switch($strPrep) {
+			case 'fuzzy':
+				$strPrepared = implode('~ ', $arrKeywords) . '~';
+				break;
+				
+			case 'wildcard_all':
+				$strPrepared = implode('* ', $arrKeywords) . '*';
+				break;
+					
+			case 'wildcard_last':
+				$strPrepared = implode(' ', $arrKeywords) . '*';
+				break;
+				
+			default:
+				$strPrepared = implode(' ', $arrKeywords);
+				break;
+		}
+		$this->setParam('q', $strPrepared);
 	}
 	
-	public function prepareQuery($strQuery, $blnFuzzy = true) {
-		$arrQuery = preg_split('/[\s\.\,\;\:\)\(\]\[\}\{_-]+/', $strQuery);
-		$arrQuery = array_filter($arrQuery, create_function('$str', 'return strlen($str) > 2;'));
-		return $arrQuery ? $blnFuzzy ? implode('~ ', $arrQuery) . '~' : implode(' ', $arrQuery) : '';
+	public function getKeywords() {
+		return $this->arrKeywords;
 	}
 	
 }

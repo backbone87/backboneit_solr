@@ -21,8 +21,11 @@ class ModuleSolrResult extends AbstractModuleSolr {
 		$this->Template->id = $this->getHTMLID();
 		
 		$strQuery = $this->Input->get('q');
-	
 		if(!strlen($strQuery)) {
+			return;
+		}
+		$arrKeywords = self::createKeywords($strQuery);
+		if(!$arrKeywords) {
 			return;
 		}
 		
@@ -35,11 +38,7 @@ class ModuleSolrResult extends AbstractModuleSolr {
 				'SolrSearchQuery'
 			);
 			
-			$strQuery = $objQuery->prepareQuery($strQuery);
-			if(!strlen($strQuery)) {
-				return;
-			}
-			$objQuery->setQuery($strQuery);
+			$objQuery->setQuery($arrKeywords, $this->bbit_solr_prep);
 			
 			$arrFilter = deserialize($this->bbit_solr_docTypes, true);
 			$arrUserFilter = explode(',', strval($this->Input->get('f')));
@@ -76,11 +75,18 @@ class ModuleSolrResult extends AbstractModuleSolr {
 		
 		$this->Template->content = true;
 		$this->Template->query = $strQuery;
+		$this->Template->keywords = $arrKeywords;
 		$this->Template->result = $objResult;
 		$this->Template->perPage = $this->bbit_solr_perPage;
 		$this->Template->maxResults = $this->bbit_solr_maxPages
 			? $this->bbit_solr_maxPages * $this->bbit_solr_perPage
 			: PHP_INT_MAX;
+	}
+	
+	public static function createKeywords($strQuery) {
+		$arrQuery = preg_split('/[\s\.\,\;\:\)\(\]\[\}\{_-]+/', $strQuery);
+		$arrQuery = array_filter($arrQuery, create_function('$str', 'return strlen($str) > 2;'));
+		return $arrQuery;
 	}
 	
 }
