@@ -8,8 +8,8 @@ class SolrSearchResult extends SolrJSONResult implements Iterator, Countable {
 	
 	protected $intPointer = 0;
 	
-	public function __construct($strContent) {
-		parent::__construct($strContent);
+	public function __construct(SolrSearchQuery $objQuery, $strContent) {
+		parent::__construct($objQuery, $strContent);
 	}
 	
 	public function getDocumentTypes() {
@@ -47,6 +47,7 @@ class SolrSearchResult extends SolrJSONResult implements Iterator, Countable {
 		
 		$objClass = $this->getDocumentClass($intOffset);
 		$objDoc = $objClass->newInstance();
+		$objDoc->setQuery($this->getQuery());
 		$objDoc->setData($this->arrContent['response']['docs'][$intOffset]);
 		$objDoc->setTemplate($this->getDocumentTemplate($objClass));
 		

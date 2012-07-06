@@ -4,10 +4,20 @@ class SolrDocument extends Template {
 	
 	protected $strTemplate = 'bbit_solr_doc';
 	
+	protected $objQuery;
+	
 	public function __construct() {
 		$strTemplate = $this->strTemplate;
 		parent::__construct();
 		$this->setTemplate($strTemplate);
+	}
+	
+	public function setQuery(SolrSearchQuery $objQuery = null) {
+		$this->objQuery = $objQuery;
+	}
+	
+	public function getQuery() {
+		return $this->objQuery;
 	}
 	
 	public function setTemplate($strTemplate) {
@@ -22,7 +32,7 @@ class SolrDocument extends Template {
 	
 	public function getTitles($strGlue = null) {
 		if(is_string($strGlue)) {
-			return implode($strGlue, $this->title);
+			return implode($strGlue, array_filter($this->title, 'strlen'));
 		} else {
 			return $this->title;
 		}

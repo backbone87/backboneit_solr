@@ -4,12 +4,18 @@ class SolrJSONResult implements SolrResult {
 	
 	protected $arrContent;
 	
-	public function __construct($strContent) {
+	protected $objQuery;
+	
+	public function __construct(SolrQuery $objQuery, $strContent) {
 		$this->arrContent = json_decode($strContent, true);
 		
 		if(is_null($this->arrContent)) {
 			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
 		}
+	}
+	
+	public function getQuery() {
+		return $this->objQuery;
 	}
 	
 	public function getContent() {

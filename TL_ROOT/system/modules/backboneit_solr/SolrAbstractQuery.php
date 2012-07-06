@@ -90,6 +90,9 @@ abstract class SolrAbstractQuery implements SolrQuery {
 		} catch(Exception $e) {
 			throw new SolrException(__CLASS__ . '::' . __METHOD__ . ' - ' . $e->getMessage()); // TODO
 		}
+		if($objRequest->hasError()) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		}
 		
 		$objResult = $this->createResult($objRequest);
 // 		$objResult->dump();
@@ -113,6 +116,11 @@ abstract class SolrAbstractQuery implements SolrQuery {
 	protected function prepareRequest(RequestExtended $objRequest) {
 	}
 	
-	abstract protected function createResult(RequestExtended $objRequest);
+	protected function createResult(RequestExtended $objRequest) {
+		if($this->getWriterType() != self::WT_JSON) {
+			throw new SolrException(__CLASS__ . '::' . __METHOD__); // TODO
+		}
+		return new SolrJSONResult($this, $objRequest->response);
+	}
 	
 }
