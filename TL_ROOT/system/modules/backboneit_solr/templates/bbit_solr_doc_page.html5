@@ -1,5 +1,8 @@
+<?php
+$strTitles = specialchars($this->getTitles(' - '));
+?>
 <div class="SolrContaoPageDocument">
-<p class="title"><a href="<?php echo $this->getURL(); ?>"
-	title="<?php echo $this->getTitles(' - '); ?>"
-	><?php echo $this->getTitles(' - '); ?></a></p>
+<p class="title"><a href="<?php echo specialchars($this->getURL()); ?>"
+	title="<?php echo $strTitles; ?>"
+	><?php echo $strTitles; ?></a></p>
 </div>

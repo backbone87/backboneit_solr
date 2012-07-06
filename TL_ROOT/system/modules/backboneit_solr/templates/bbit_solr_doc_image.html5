@@ -1,14 +1,21 @@
-<?php $this->prepareImage(array(50, 50)); ?>
+<?php
+$this->prepareImage(array(50, 50));
+$strURL = specialchars($this->getURL());
+$strTitle = specialchars($this->getTitle(0));
+$strTitles = specialchars($this->getTitles(' - '));
+?>
 <div class="SolrImageDocument">
 <div class="image_container">
-<a href="<?php echo $this->getURL(); ?>" <?php echo $this->attributes;?>
-	title="<?php echo $this->getTitle(0); ?>"
-	><img src="<?php echo $this->src; ?>" width="<?php echo $this->width; ?>" height="<?php echo $this->height; ?>"
-		alt="<?php echo $this->getTitle(1); ?>"
+<a href="<?php echo $strURL; ?>" <?php echo $this->attributes;?>
+	title="<?php echo $strTitle; ?>"
+	><img src="<?php echo specialchars($this->src); ?>"
+		width="<?php echo $this->width; ?>" height="<?php echo $this->height; ?>"
+		alt="<?php echo specialchars($this->getTitle(1)); ?>"
 	/></a>
 </div>
-<p class="title"><a href="<?php echo $this->getURL(); ?>" title="<?php echo $this->getTitle(0); ?>"
-	><?php echo $this->getTitles(' - '); ?></a></p>
-<p class="direct"><a href="<?php echo $this->getImageURL(); ?>"
-	title="<?php echo $this->getTitles(' - '); ?>">Direkt zum Bild</a></p> 
+<p class="title"><a href="<?php echo $strURL; ?>"
+title="<?php echo $strTitle; ?>"
+	><?php echo $strTitles; ?></a></p>
+<p class="direct"><a href="<?php echo specialchars($this->getImageURL()); ?>"
+	title="<?php echo $strTitles; ?>">Direkt zum Bild</a></p> 
 </div>
