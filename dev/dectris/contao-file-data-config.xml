@@ -1,0 +1,66 @@
+<dataConfig>
+  <script><![CDATA[
+  
+    function preprocess(row, ctx) {
+      if(ctx.resolve("dataimporter.request.unindex") == "1") {
+        row.put("$skipDoc", "true");
+      }
+      return row;
+    };
+    
+    function addTitleFromPath(row, ctx) {
+      var title = new java.util.ArrayList();
+      
+      var path = row.get("m_path_s");
+      path = new String(path).split("/");
+      path = path[path.length - 1];
+      path = new String(path).split(".");
+      path = new java.lang.String(path[0]);
+
+      var decoder = new java.net.URLDecoder();
+      path = decoder.decode(path, "UTF-8");
+      path = path.split("[\\s\\_\\-]");
+      
+      var builder = new java.lang.StringBuilder();
+      builder.append(path[0].substr(0, 1).toUpperCase());
+      builder.append(path[0].substr(1));
+      for(var i = 1, n = path.length; i < n; i++) {
+        builder.append(" ");
+        builder.append(path[i].substr(0, 1).toUpperCase());
+        builder.append(path[i].substr(1));
+      }
+      path = builder.toString();
+
+      title.add(path);
+      row.put("title", title);
+      
+      return row;
+    };
+    
+  ]]></script>
+
+  <dataSource name="web" type="URLDataSource" />
+  <dataSource name="webBin" type="BinURLDataSource" />
+
+  <document>
+
+    <entity name="req" rootEntity="false" processor="LineEntityProcessor" dataSource="web"
+      url="${dataimporter.request.files}" transformer="script:preprocess,TemplateTransformer,RegexTransformer,script:addTitleFromPath"
+      preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;">
+      <field column="m_source_s" template="${dataimporter.request.source}" />
+      <field column="m_base_s" template="${dataimporter.request.base}" />
+      <!-- ignore_ makes the request body an unindexed dynamic field (just dropped on index update) -->
+      <field column="rawLine" name="ignore_rawLine" regex="([^\,]+)\,(.*)" groupNames="m_doctype_s,m_path_s" />
+      
+      <entity name="file" processor="TikaEntityProcessor" dataSource="webBin"
+        url="${dataimporter.request.base}${req.m_path_s}" transformer="TemplateTransformer">
+        <!-- <field column="title" name="title" meta="true" /> -->
+        <field column="text" name="text" />
+        <field column="id" template="${req.m_base_s}${req.m_path_s}" />
+      </entity>
+
+    </entity>
+
+  </document>
+
+</dataConfig>

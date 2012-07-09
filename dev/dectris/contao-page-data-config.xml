@@ -1,0 +1,166 @@
+<dataConfig>
+  <script><![CDATA[
+  
+    function preprocess(row, ctx) {
+      if(ctx.resolve("dataimporter.request.unindex") == "1") {
+        row.put("$skipDoc", "true");
+      }
+      return row;
+    }
+    
+    function stripNonIndexed(row) {
+      var content = row.get("plainText"),
+          begin = "<!-- indexer::stop -->",
+          end = "<!-- indexer::continue -->",
+          b = content.indexOf(begin, 0),
+          e, i, j;
+      
+      for(;;) {
+        e = i = j = b + begin.length;
+        
+        do {
+          j = content.indexOf(end, e);
+          if(j == -1) break; // no end tag found
+          e = j + end.length;
+          
+          i = content.indexOf(begin, i);
+          if(i == -1) break; // no next begin tag
+          i = i + begin.length;
+          
+        } while(i < j);
+        
+        if(e == b + begin.length) break; // no end tag found
+        
+        content = content.substr(0, b) + content.substr(e);
+        
+        if(i == -1) break; // no next begin tag found
+        
+        b = i + b - e - begin.length; // correct position of next begin tag
+      }
+      
+      var str = new java.lang.String(content);
+      row.put("plainText", str.getBytes());
+      return row;
+    }
+    
+    
+    function removeBase(row, ctx) {
+      var src = new String(row.get("m_src_s")), base = new String(row.get("m_base_s"));
+      if(src.length && base.length && src.indexOf(base) == 0) {
+        src = src.substr(base.length);
+        row.put("m_src_s", src);
+      }
+      return row;
+    }
+    
+     
+    function addTitleFromPath(row, ctx) {
+      //var title = new java.util.ArrayList();
+      var title = row.get("title");
+      
+      var path = row.get("m_src_s");
+      path = new String(path).split("/");
+      path = path[path.length - 1];
+      path = new String(path).split(".");
+      path = new java.lang.String(path[0]);
+
+      var decoder = new java.net.URLDecoder();
+      path = decoder.decode(path, "UTF-8");
+      path = path.split("[\\s\\_\\-]");
+      
+      var builder = new java.lang.StringBuilder();
+      builder.append(path[0].substr(0, 1).toUpperCase());
+      builder.append(path[0].substr(1));
+      for(var i = 1, n = path.length; i < n; i++) {
+        builder.append(" ");
+        builder.append(path[i].substr(0, 1).toUpperCase());
+        builder.append(path[i].substr(1));
+      }
+      path = builder.toString();
+
+      title.add(path);
+      row.put("title", title);
+      
+      return row;
+    }
+    
+  ]]></script>
+
+  <dataSource name="web" type="URLDataSource" />
+  <dataSource name="db" type="JdbcDataSource" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/dectris_contao"
+    user="contao" password="$Dectris2012Contao$" />
+  <dataSource name="fieldStream" type="FieldStreamDataSource" />
+  <dataSource name="fieldReader" type="FieldReaderDataSource" />
+
+  <document>
+
+    <entity name="req" rootEntity="false"
+      preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;"
+      dataSource="web" url="${dataimporter.request.pages}"
+      processor="PlainTextEntityProcessor"
+      transformer="script:preprocess,TemplateTransformer">
+      <field column="m_source_s" template="${dataimporter.request.source}" />
+      <!-- ignore_ makes the request body an unindexed dynamic field (just dropped on index update) -->
+      <field column="plainText" name="ignore_pages" />
+
+      <entity name="index" rootEntity="false" 
+        dataSource="db"
+        processor="SqlEntityProcessor" query="
+              SELECT  s.page AS m_page_i,
+	                  s.root AS m_root_i,
+	                  s.request AS m_request_s,
+                      s.base AS m_base_s,
+	                  IF(LENGTH(p.pageTitle) != 0, p.pageTitle, p.title) AS title,
+	                  p.language AS m_language_s
+	          FROM    tl_bbit_solr_page AS s
+	          JOIN    tl_page AS p ON p.id = s.page
+	          WHERE   p.id IN (${req.plainText})
+	          AND     p.type = 'regular'
+              AND     p.published = '1'
+              AND     0 != LOCATE(p.alias, s.request)
+        "
+        transformer="TemplateTransformer">
+
+        <entity name="fetch" rootEntity="false" onError="skip"
+          dataSource="web" url="${index.m_base_s}${index.m_request_s}"
+          processor="PlainTextEntityProcessor"
+          transformer="script:stripNonIndexed">
+
+          <entity name="page"
+            dataSource="fieldStream" dataField="fetch.plainText"
+            processor="TikaEntityProcessor"
+            transformer="TemplateTransformer">
+            <field column="m_doctype_s" template="SolrContaoPageDocument" />
+            <field column="text" name="text" />
+            <field column="id" template="${index.m_base_s}${index.m_request_s}" />
+          </entity>
+          
+          <entity name="tagsoup" rootEntity="false"
+            dataSource="fieldStream" dataField="fetch.plainText"
+            processor="TikaEntityProcessor" format="xml">
+              <field column="text" name="ignore_text" />
+            
+              <entity name="images"
+                dataSource="fieldReader" dataField="tagsoup.text"
+                processor="XPathEntityProcessor" xsl="images.xsl" forEach="/images/image"
+                transformer="TemplateTransformer,script:removeBase,script:addTitleFromPath">
+                <field column="m_doctype_s" template="SolrImageDocument" />
+                <field column="m_base_s" template="${index.m_base_s}" />
+                <field column="m_src_s" xpath="//img/@src" /> <!-- this will be absolute becuase of TikeEntityProcessor with format "xml", remove base fixes this -->
+                <field column="title" xpath="//img/@alt" />
+                <field column="id" template="${images.m_src_s}" />
+              </entity>
+            
+          </entity>
+
+        </entity>
+
+
+
+      </entity>
+
+    </entity>
+
+  </document>
+
+</dataConfig>
