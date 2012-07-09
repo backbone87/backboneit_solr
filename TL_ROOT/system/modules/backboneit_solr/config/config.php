@@ -9,6 +9,8 @@ $GLOBALS['BE_MOD']['system']['bbit_solr_index'] = array('callback' => 'ModuleSol
 
 $GLOBALS['TL_HOOKS']['outputFrontendTemplate'][] = array('SolrContaoPageSourceManager', 'hookOutputFrontendTemplate');
 
+$GLOBALS['TL_CACHE']['bbit_solr_page'] = 'tl_bbit_solr_page';
+
 // $GLOBALS['TL_CRON']['daily'][] = array('SolrContaoPageSourceManager', 'cleanURLIndex');
 $GLOBALS['TL_CRON']['daily'][] = array('SolrIndexManager', 'runUpdates');
 
