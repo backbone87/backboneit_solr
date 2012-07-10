@@ -24,7 +24,12 @@ class ModuleSolrResult extends AbstractModuleSolr {
 		if(!strlen($strQuery)) {
 			return;
 		}
-		$arrKeywords = self::createKeywords($strQuery);
+		$arrKeywords = self::createKeywords(
+			$strQuery,
+			$this->bbit_solr_keywordMinLength,
+			$this->bbit_solr_keywordSplit,
+			$this->bbit_solr_keywordSplitRaw
+		);
 		if(!$arrKeywords) {
 			return;
 		}
@@ -83,10 +88,14 @@ class ModuleSolrResult extends AbstractModuleSolr {
 			: PHP_INT_MAX;
 	}
 	
-	public static function createKeywords($strQuery) {
-		$arrQuery = preg_split('/[\s\.\,\;\:\)\(\]\[\}\{_-]+/', $strQuery);
-		$arrQuery = array_filter($arrQuery, create_function('$str', 'return strlen($str) > 2;'));
-		return $arrQuery;
+	public static function createKeywords($strQuery, $intMinLength = 3, $strSplit = '.,;:()[]{}_-', $strSplitRaw = '\s') {
+		if(strlen($strSplit) || strlen($strSplitRaw)) {
+			$strQuery = preg_split('/[' . preg_quote($strSplit, '/') . $strSplitRaw . ']+/', $strQuery);
+		}
+		$strQuery = array_filter((array) $strQuery, create_function(
+			'$str', 'return strlen($str) >= ' . max(2, intval($intMinLength)) . ';'
+		));
+		return $strQuery;
 	}
 	
 }

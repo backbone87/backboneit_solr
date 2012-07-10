@@ -165,7 +165,8 @@ $GLOBALS['TL_DCA']['tl_module']['palettes']['bbit_solr_resultbbit_solr_nocopy']
 	. ',bbit_solr_index,bbit_solr_handler'
 	. ',bbit_solr_sources'
 	. ';{bbit_solr_search_legend}'
-	. ',bbit_solr_prep'
+	. ',bbit_solr_keywordSplit,bbit_solr_keywordSplitRaw'
+	. ',bbit_solr_keywordMinLength,bbit_solr_prep'
 	. ',bbit_solr_docTypes'
 	. ';{bbit_solr_tpl_legend}'
 	. ',bbit_solr_perPage,bbit_solr_maxPages'
@@ -235,16 +236,55 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_sources'] = array(
 	),
 );
 
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_keywordSplit'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordSplit'],
+	'exclude'		=> true,
+	'inputType'		=> 'text',
+	'default'		=> '.,;:()[]{}_-',
+	'eval'			=> array(
+		'decodeEntities'=> true,
+		'tl_class'		=> 'clr w50',
+	),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_keywordSplitRaw'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordSplitRaw'],
+	'exclude'		=> true,
+	'inputType'		=> 'text',
+	'default'		=> '\s',
+	'eval'			=> array(
+		'nospace'		=> true,
+		'decodeEntities'=> true,
+		'tl_class'		=> 'w50',
+	),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_keywordMinLength'] = array(
+	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordMinLength'],
+	'exclude'		=> true,
+	'inputType'		=> 'text',
+	'default'		=> 10,
+	'eval'			=> array(
+		'mandatory'		=> true,
+		'rgxp'			=> 'digit',
+		'nospace'		=> true,
+		'tl_class'		=> 'clr w50',
+	),
+	'save_callback' => array(
+		array('SolrUtils', 'savePositiveInteger'),
+	),
+);
+
 $GLOBALS['TL_DCA']['tl_module']['fields']['bbit_solr_prep'] = array(
 	'label'			=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prep'],
 	'exclude'		=> true,
 	'inputType'		=> 'select',
-	'options'		=> array('fuzzy', 'wildcard_all', 'wildcard_last'),
+	'options'		=> array('fuzzy', 'wildcard_all', 'wildcard_last', 'fuzzy_wildcard_last'),
 	'reference'		=> &$GLOBALS['TL_LANG']['tl_module']['bbit_solr_prepOptions'],
 	'eval'			=> array(
 		'includeBlankOption'=> true,
 		'chosen'		=> true,
-// 		'tl_class'		=> 'clr w50',
+		'tl_class'		=> 'w50',
 	)
 );
 

@@ -53,12 +53,19 @@ $GLOBALS['TL_LANG']['tl_module']['bbit_solr_sources']
 
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_search_legend']
 	= 'Such-Einstellungen';
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordSplit']
+	= array('Anfragezerlegung', 'Die Zeichen an denen die Suchanfrage in einzelne Suchwörter zerlegt wird.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordSplitRaw']
+	= array('Anfragezerlegung (RegEx)', 'Die Zeichen (gemäß POSIX Regulären Ausdrücken) an denen die Suchanfrage in einzelne Suchwörter zerlegt wird.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordMinLength']
+	= array('Suchwort Mindestlänge', 'Die Minimallänge eines Suchworts. Wörter die kürzer sind, werden ignoriert.');
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_prep']
 	= array('Anfrage Vorverarbeitung', 'Der Mechanismus der zur Vorverarbeitung der Suchanfrage verwendet werden soll.');
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_prepOptions'] = array(
 	'fuzzy'	=> 'Ähnlichkeits-Suche',
 	'wildcard_all' => 'Platzhalter am Ende (alle Suchwörter)',
 	'wildcard_last' => 'Platzhalter am Ende (nur letztes Suchwort)',
+	'fuzzy_wildcard_last' => 'Platzhalter am Ende (nur letztes Suchwort), sonst Ähnlichkeits-Suche',
 );
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_docTypes']
 	= array('Dokumenttypen-Filter', 'Wählen Sie die Dokumenttypen nach denen die Ergebnisse eingeschränkt werden sollen.');

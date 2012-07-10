@@ -46,6 +46,10 @@ class SolrSearchQuery extends SolrAbstractQuery {
 			case 'wildcard_last':
 				$strPrepared = implode(' ', $arrKeywords) . '*';
 				break;
+					
+			case 'fuzzy_wildcard_last':
+				$strPrepared = implode('~ ', $arrKeywords) . '*';
+				break;
 				
 			default:
 				$strPrepared = implode(' ', $arrKeywords);

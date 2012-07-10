@@ -52,12 +52,19 @@ $GLOBALS['TL_LANG']['tl_module']['bbit_solr_sources']
 
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_search_legend']
 	= 'Search settings';
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordSplit']
+	= array('Query splitting', 'The characters at which the query will be split into separate search keywords.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordSplitRaw']
+	= array('Query splitting (RegEx)', 'The characters (in POSIX regular expression syntax) at which the query will be split into separate search keywords.');
+$GLOBALS['TL_LANG']['tl_module']['bbit_solr_keywordMinLength']
+	= array('Keyword min length', 'The minimum length of search keywords. Keywords which are shorter will be ignored.');
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_prep']
 	= array('Query Preparation', 'The mechanism to be used to prepare the query for search.');
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_prepOptions'] = array(
 	'fuzzy'	=> 'Fuzzy search',
 	'wildcard_all' => 'Wildcard at the end (all keywords)',
 	'wildcard_last' => 'Wildcard at the end (only last keyword)',
+	'fuzzy_wildcard_last' => 'Wildcard at the end (only last keyword), other keywords fuzzy search',
 );
 $GLOBALS['TL_LANG']['tl_module']['bbit_solr_docTypes']
 	= array('Document type filter', 'Choose the document types the results will be limited to.');
