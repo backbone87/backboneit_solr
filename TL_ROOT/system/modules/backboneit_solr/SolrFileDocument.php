@@ -9,11 +9,12 @@ class SolrFileDocument extends SolrDocument {
 	}
 	
 	public function parse() {
-		$this->file = new File($this->m_path_s);
-		
-		$this->href = $this->Environment->base . $this->file->value;
-		$this->filesize = $this->getReadableSize($this->file->filesize, 1);
-		$this->icon = TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/' . $this->file->icon;
+		if(is_file(TL_ROOT . '/' . $this->m_path_s)) {
+			$this->file = new File($this->m_path_s);
+			$this->href = $this->Environment->base . $this->file->value;
+			$this->filesize = $this->getReadableSize($this->file->filesize, 1);
+			$this->icon = TL_FILES_URL . 'system/themes/' . $this->getTheme() . '/images/' . $this->file->icon;
+		}
 		
 		return parent::parse();
 	}

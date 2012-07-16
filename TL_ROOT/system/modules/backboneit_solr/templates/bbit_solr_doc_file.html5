@@ -2,11 +2,15 @@
 $strTitles = specialchars($this->getTitles(' - '));
 ?>
 <div class="SolrFileDocument">
-<p class="file"><a href="<?php echo specialchars($this->href); ?>" title="<?php echo $strTitles; ?>"
-	><img src="<?php echo $this->icon; ?>" width="18" height="18"
-		alt="<?php echo specialchars($this->file->mime); ?>" class="mime_icon"
-	> <span class="title"><?php echo $strTitles; ?></span
-	> <span class="size">(<?php echo $this->filesize; ?>)</span
-	></a></p>
+<p class="file"><a
+	href="<?php echo specialchars($this->href); ?>" title="<?php echo $strTitles; ?>"
+	><?php if($this->file):
+		?><img src="<?php echo $this->icon; ?>" width="18" height="18"
+			alt="<?php echo specialchars($this->file->mime); ?>" class="mime_icon"
+		> <span class="title"><?php echo $strTitles; ?></span
+		> <span class="size">(<?php echo $this->filesize; ?>)</span
+		><?php
+	else: ?><span class="title"><?php echo $strTitles; ?></span><?php 
+	endif; ?></a></p>
 
 </div>
