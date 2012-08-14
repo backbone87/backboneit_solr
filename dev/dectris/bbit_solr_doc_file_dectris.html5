@@ -1,0 +1,16 @@
+<?php
+	$strTitle = basename($this->m_path_s);
+?>
+<div class="SolrFileDocument">
+<p class="file"><a
+	href="<?php echo specialchars($this->getURL(false)); ?>" title="<?php echo $strTitle; ?>"
+	><?php if($this->file):
+		?><img src="<?php echo $this->icon; ?>" width="18" height="18"
+			alt="<?php echo specialchars($this->file->mime); ?>" class="mime_icon"
+		> <span class="title"><?php echo $strTitle; ?></span
+		> <span class="size">(<?php echo $this->filesize; ?>)</span
+		><?php
+	else: ?><span class="title"><?php echo $strTitle ?></span><?php 
+	endif; ?></a></p>
+
+</div>
