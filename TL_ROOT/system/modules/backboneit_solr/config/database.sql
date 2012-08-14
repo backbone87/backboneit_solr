@@ -7,6 +7,41 @@
 -- *                                                        *
 -- **********************************************************
 
+CREATE TABLE `tl_bbit_solr_index` (
+
+  `id` int(10) unsigned NOT NULL default '0',
+  `tstamp` int(10) unsigned NOT NULL default '0',
+  
+  `title` varchar(255) NOT NULL default '',
+  `url` varchar(1022) NOT NULL default '',
+  `core` varchar(1022) NOT NULL default '',
+  
+  `sources` blob NULL,
+  
+  PRIMARY KEY  (`id`),
+  KEY `tstamp` (`tstamp`),
+  
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `tl_bbit_solr_handler` (
+
+  `id` int(10) unsigned NOT NULL default '0',
+  `pid` int(10) unsigned NOT NULL default '0',
+  `tstamp` int(10) unsigned NOT NULL default '0',
+  
+  `handlerClass` varchar(1022) NOT NULL default '',
+  `queryClass` varchar(1022) NOT NULL default '',
+  `endpoint` varchar(1022) NOT NULL default '',
+  `solrClass` varchar(1022) NOT NULL default '',
+  
+  PRIMARY KEY  (`id`),
+  KEY `pid` (`pid`),
+  KEY `tstamp` (`tstamp`),
+  
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
 CREATE TABLE `tl_bbit_solr_page` (
 
   `page` int(10) unsigned NOT NULL default '0',

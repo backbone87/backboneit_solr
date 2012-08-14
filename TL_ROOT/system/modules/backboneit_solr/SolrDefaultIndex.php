@@ -2,6 +2,8 @@
 
 final class SolrDefaultIndex extends SolrAbstractIndex {
 	
+	const NAME = 'default';
+	
 	protected $strEndpoint;
 	
 	protected $arrHandler;
@@ -9,7 +11,7 @@ final class SolrDefaultIndex extends SolrAbstractIndex {
 	protected $arrSources;
 	
 	protected function __construct() {
-		parent::__construct('default');
+		parent::__construct(self::NAME);
 		$this->initialize();
 	}
 	
@@ -33,7 +35,7 @@ final class SolrDefaultIndex extends SolrAbstractIndex {
 	}
 	
 	public function initialize() {
-		$arrConfig = $GLOBALS['SOLR_DEFAULT_INDEX'];
+		$arrConfig = $GLOBALS['BBIT_SOLR']['DEFAULT_INDEX'];
 		
 		$this->arrHandlers = array();
 		foreach($arrConfig['handlers'] as $arrHandler) {

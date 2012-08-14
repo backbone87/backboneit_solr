@@ -60,7 +60,7 @@ final class SolrUtils extends Backend {
 	
 	public function getDocumentTypeOptions() {
 		$arrTypes = array();
-		foreach($GLOBALS['SOLR_DOCTYPES'] as $strDocType) {
+		foreach($GLOBALS['BBIT_SOLR']['DOCTYPES'] as $strDocType) {
 			$arrTypes[$strDocType] = $this->getDocumentTypeLabel($strDocType);
 		}
 		asort($arrTypes);
@@ -216,9 +216,17 @@ final class SolrUtils extends Backend {
 		return $arrRows;
 	}
 	
+	public function loadCSL($varValue) {
+		return explode(',', $varValue);
+	}
+	
+	public function saveCSL($varValue) {
+		return implode(',', deserialize($varValue, true));
+	}
+	
 	public function executeCallbacks($varCallbacks) {
 		if(is_string($varCallbacks)) {
-			$varCallbacks = $GLOBALS['BBIT_SOLR_HOOKS'][$varCallbacks];
+			$varCallbacks = $GLOBALS['BBIT_SOLR']['HOOKS'][$varCallbacks];
 		}
 		if(!is_array($varCallbacks)) {
 			return array();
