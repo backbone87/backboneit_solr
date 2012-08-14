@@ -1,0 +1,60 @@
+Contao-Erweiterung "backboneit_solr":
+- Befindet sich im Contao-Verzeichnis unter "system/modules/backboneit_solr"
+- Konfiguration via localconfig.php (Backend Konfiguration in Arbeit)
+- 4 Komponenten: Solr-Index, Document, Suchquellen, Solr-Queries
+
+- Suchquellen:
+-> Produzieren ein oder mehrere Index-Einträge
+-> Jeder Index kann beliebig viele Suchquellen indizieren
+-> Produzierte Index-Einträge können verschiedene Ergebis-Documents produzieren (SolrContaoPageSource generiert PageDocuments und ImageDocuments)
+-> Typen:
+--> SolrContaoPageSource: Indiziert FE-Seiten unterhalb einer konfigurierten Wurzelseite und darin vorkommende Bilder via Solr Data Import Handler
+--> SolrFileSource: Indiziert Dateien aus bestimmten Ordnern (Dateien können via RegEx gefiltert werden)
+
+- Solr-Index:
+-> Reflektiert die Konfiguration der zu verwendenden Solr-Umgebung
+-> Zur Zeit nur ein Standardindex via localconfig.php zu konfigurieren
+-> Legt fest über welche Endpunkte (Solr RequestHandler via HTTP) Contao mit Solr kommuniziert und welche Querytypen die einzelnen RequestHandler benötigen
+-> Legt fest welche Suchquellen indiziert werden sollen und welchen RequestHandler jede einzelne Suchquelle verwenden soll
+
+- Solr-Query:
+-> Basisklasse Abstrahiert einfache HTTP Anfragen (via Erweiterung httprequestextended) an Solr RequestHandler
+-> Subklassen Abstrahieren verschiedene Querytypen: Data Import Handler Queries, Search Queries
+
+- Document:
+-> Für Ausgabe verantwortlich
+-> Template-basierend
+-> Subklassen zur Verarbeitung und Vorbereitung der einzelnen Suchergebnisse: PageDocument, ImageDocument, FileDocument
+-> Jede Subklasse reichert die Templates mit verschiedenen Variablen zur Ausgabe des Ergebnis an
+
+
+Solr:
+- Befindet sich in "/opt/solr" (inkl. SharedLibs)
+- Läuft im Tomcat Container als WebApp unter dem Kontextpfad "/solr"
+- Solr Standard Konfiguration mit 2 zusätzlichen Data Import Handlern (DIH)
+- DIH "/contao-page" wird von SolrContaoPageSource zum indexieren verwendet
+- DIH "/contao-file" wird von SolrFileSource zum indexieren verwendet
+
+
+
+Indexing:
+-> SolrIndex->update(): Initialisiert alle konfigurierten SolrSource's und ruft für jede Quelle die index-Methode auf und übergibt den zu verwendenden SolrRequestHandler
+-> SolrSource->index(): Löscht alle indizierten Einträge die von dieser Quelle produziert wurden. Danach werden alle zu indexierenden Einträge neu produziert und an den Solr zum indexieren geschickt. Der konkrete Indexierung-Prozess ist abhängig von der Implementierung der SolrSource.
+
+SolrContaoPageSource-Indexing:
+-> Benutzt "/contao-page" DIH
+-> DIH-Konfiguration ist in "opt/solr/conf/contao-page-data-config.xml"
+-> Loggt jede im Frontend aufrufene URL (ohne Query-Part) in der Contao-DB in der Tabelle "tl_bbit_solr_page"
+-> Liste von IDs der zu indizierenden Seiten wird an den DIH gesendet
+-> DIH liest die aufgerufenen URLs dieser Seiten aus der Contao-DB
+-> Jede URL wird gefetcht und der Inhalt durch Apache Tika (angebunden an Solr) normalisiert (XML)
+-> Danach wird der Text extrahiert (ebenfalls durch Tika) und für jede Seite ein Index-Eintrag angelegt
+-> zusätzlich wird aus dem normalisierten Inhalt via XSLT die Bilder extrahiert und indiziert
+
+SolrFileSource-Indexing:
+-> Benutzt "/contao-file" DIH
+-> DIH-Konfiguration ist in "opt/solr/conf/contao-file-data-config.xml"
+-> Anhand der Konfiguration der Quelle wird eine Liste von zu indizierenden Dateien erstellt, welche an den DIH gesendet wird
+-> DIH ruft jede Datei ab und normalisiert diese via Apache Tika
+-> Aus den normalisierten Ergebnis wird via Apache Tika der Text extrahiert und indiziert.
+
