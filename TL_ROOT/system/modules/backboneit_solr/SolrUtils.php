@@ -108,17 +108,24 @@ final class SolrUtils extends Backend {
 			return array();
 		}
 		
-		return $this->getTemplateGroupExcludeDefault($strDefault);
+		$intTheme = $this->Input->get('act') == 'overrideAll'
+			? $this->Input->get('id')
+			: $objDC->activeRecord->pid;
+		return $this->getTemplateGroupExcludeDefault($strDefault, $intTheme);
 	}
 	
-	public function getDocTplOptions() {
-		return $this->getTemplateGroupExcludeDefault('bbit_solr_doc');
+	public function getDocTplOptions($objDC) {
+		$intTheme = $this->Input->get('act') == 'overrideAll'
+			? $this->Input->get('id')
+			: $this->Database->prepare(
+				'SELECT pid FROM tl_module WHERE id = ?'
+			)->execute($this->Input->get('id'))->pid;
+		return $this->getTemplateGroupExcludeDefault('bbit_solr_doc', $intTheme);
 	}
 	
-	protected function getTemplateGroupExcludeDefault($strDefault) {
-		$intPID = $this->Input->get('act') == 'overrideAll' ? $this->Input->get('id') : $objDC->activeRecord->pid;
-		$arrTpls = $this->getTemplateGroup($strDefault, $intPID);
-		
+	protected function getTemplateGroupExcludeDefault($strDefault, $intTheme) {
+		$arrTpls = $this->getTemplateGroup($strDefault, $intTheme);
+
 		$intDefault = array_search($strDefault, $arrTpls);
 		if($intDefault !== false) {
 			unset($arrTpls[$intDefault]);
