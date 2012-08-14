@@ -44,16 +44,20 @@
 
   <document>
 
-    <entity name="req" rootEntity="false" processor="LineEntityProcessor" dataSource="web"
-      url="${dataimporter.request.files}" transformer="script:preprocess,TemplateTransformer,RegexTransformer,script:addTitleFromPath"
-      preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;">
+    <entity name="req" rootEntity="false"
+        preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;"
+        dataSource="web" url="${dataimporter.request.files}"
+        processor="LineEntityProcessor"
+        transformer="script:preprocess,TemplateTransformer,RegexTransformer,script:addTitleFromPath">
       <field column="m_source_s" template="${dataimporter.request.source}" />
       <field column="m_base_s" template="${dataimporter.request.base}" />
       <!-- ignore_ makes the request body an unindexed dynamic field (just dropped on index update) -->
       <field column="rawLine" name="ignore_rawLine" regex="([^\,]+)\,(.*)" groupNames="m_doctype_s,m_path_s" />
       
-      <entity name="file" processor="TikaEntityProcessor" dataSource="webBin"
-        url="${dataimporter.request.base}${req.m_path_s}" transformer="TemplateTransformer">
+      <entity name="file" onError="skip"
+          dataSource="webBin" url="${dataimporter.request.base}${req.m_path_s}"
+          processor="TikaEntityProcessor"
+          transformer="TemplateTransformer">
         <field column="title" name="title" meta="true" />
         <field column="text" name="text" />
         <field column="id" template="${req.m_base_s}${req.m_path_s}" />

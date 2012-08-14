@@ -95,67 +95,65 @@
   <document>
 
     <entity name="req" rootEntity="false"
-      preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;"
-      dataSource="web" url="${dataimporter.request.pages}"
-      processor="PlainTextEntityProcessor"
-      transformer="script:preprocess,TemplateTransformer">
+        preImportDeleteQuery="+m_source_s:&quot;${dataimporter.request.source}&quot;"
+        dataSource="web" url="${dataimporter.request.pages}"
+        processor="PlainTextEntityProcessor"
+        transformer="script:preprocess,TemplateTransformer">
       <field column="m_source_s" template="${dataimporter.request.source}" />
       <!-- ignore_ makes the request body an unindexed dynamic field (just dropped on index update) -->
       <field column="plainText" name="ignore_pages" />
 
       <entity name="index" rootEntity="false" 
-        dataSource="db"
-        processor="SqlEntityProcessor" query="
-              SELECT  s.page AS m_page_i,
-	                  s.root AS m_root_i,
-	                  s.request AS m_request_s,
-                      s.base AS m_base_s,
-	                  IF(LENGTH(p.pageTitle) != 0, p.pageTitle, p.title) AS title,
-	                  p.language AS m_language_s
-	          FROM    tl_bbit_solr_page AS s
-	          JOIN    tl_page AS p ON p.id = s.page
-	          WHERE   p.id IN (${req.plainText})
-	          AND     p.type = 'regular'
-              AND     p.published = '1'
-              AND     0 != LOCATE(p.alias, s.request)
-        "
-        transformer="TemplateTransformer">
+          dataSource="db"
+          processor="SqlEntityProcessor" query="
+            SELECT  s.page AS m_page_i,
+                    s.root AS m_root_i,
+                    s.request AS m_request_s,
+                    s.base AS m_base_s,
+                    IF(LENGTH(p.pageTitle) != 0, p.pageTitle, p.title) AS title,
+                    p.language AS m_language_s
+            FROM    tl_bbit_solr_page AS s
+            JOIN    tl_page AS p ON p.id = s.page
+            WHERE   p.id IN (${req.plainText})
+            AND     p.type = 'regular'
+            AND     p.published = '1'
+            AND     0 != LOCATE(p.alias, s.request)
+          "
+          transformer="TemplateTransformer">
 
         <entity name="fetch" rootEntity="false" onError="skip"
-          dataSource="web" url="${index.m_base_s}${index.m_request_s}"
-          processor="PlainTextEntityProcessor"
-          transformer="script:stripNonIndexed">
+            dataSource="web" url="${index.m_base_s}${index.m_request_s}"
+            processor="PlainTextEntityProcessor"
+            transformer="script:stripNonIndexed">
 
           <entity name="page"
-            dataSource="fieldStream" dataField="fetch.plainText"
-            processor="TikaEntityProcessor"
-            transformer="TemplateTransformer">
+              dataSource="fieldStream" dataField="fetch.plainText"
+              processor="TikaEntityProcessor"
+              transformer="TemplateTransformer">
             <field column="m_doctype_s" template="SolrContaoPageDocument" />
             <field column="text" name="text" />
             <field column="id" template="${index.m_base_s}${index.m_request_s}" />
           </entity>
           
           <entity name="tagsoup" rootEntity="false"
-            dataSource="fieldStream" dataField="fetch.plainText"
-            processor="TikaEntityProcessor" format="xml">
-              <field column="text" name="ignore_text" />
-            
-              <entity name="images"
+              dataSource="fieldStream" dataField="fetch.plainText"
+              processor="TikaEntityProcessor" format="xml">
+            <field column="text" name="ignore_text" />
+          
+            <entity name="images"
                 dataSource="fieldReader" dataField="tagsoup.text"
                 processor="XPathEntityProcessor" xsl="images.xsl" forEach="/images/image"
                 transformer="TemplateTransformer,script:removeBase,script:addTitleFromPath">
-                <field column="m_doctype_s" template="SolrImageDocument" />
-                <field column="m_base_s" template="${index.m_base_s}" />
-                <field column="m_src_s" xpath="//img/@src" /> <!-- this will be absolute becuase of TikeEntityProcessor with format "xml", remove base fixes this -->
-                <field column="title" xpath="//img/@alt" />
-                <field column="id" template="${images.m_src_s}" />
-              </entity>
+              <field column="m_doctype_s" template="SolrImageDocument" />
+              <field column="m_base_s" template="${index.m_base_s}" />
+              <field column="m_src_s" xpath="//img/@src" /> <!-- this will be absolute becuase of TikeEntityProcessor with format "xml", remove base fixes this -->
+              <field column="title" xpath="//img/@alt" />
+              <field column="id" template="${images.m_src_s}" />
+            </entity>
             
           </entity>
 
         </entity>
-
-
 
       </entity>
 
