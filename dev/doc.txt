@@ -1,7 +1,7 @@
 Contao-Erweiterung "backboneit_solr":
 - Befindet sich im Contao-Verzeichnis unter "system/modules/backboneit_solr"
 - Konfiguration via localconfig.php (Backend Konfiguration in Arbeit)
-- 4 Komponenten: Solr-Index, Document, Suchquellen, Solr-Queries
+- 4 API-Komponenten: Solr-Index, Document, Suchquellen, Solr-Queries
 
 - Suchquellen:
 -> Produzieren ein oder mehrere Index-Einträge
@@ -27,6 +27,20 @@ Contao-Erweiterung "backboneit_solr":
 -> Subklassen zur Verarbeitung und Vorbereitung der einzelnen Suchergebnisse: PageDocument, ImageDocument, FileDocument
 -> Jede Subklasse reichert die Templates mit verschiedenen Variablen zur Ausgabe des Ergebnis an
 
+- 2 Contao FE-Module: ModuleSolrSearch, ModuleSolrResult
+
+- ModuleSolrSearch:
+-> Rendert Suchanfrage-Form (Template mod_bbit_solr_search)
+-> Bietet Ergebnistyp-Filter für Nutzer der Suche
+-> Integriert die Live-Search via JS: Es wird ein spezieller Parameter an die Form-action angehangen, welche beim ModuleSolrResult bewirkt das nur dieses Modul anstatt die komplette Zielseite gerendert wird 
+
+- ModuleSolrResult:
+-> Empfängt Suchstring und Nutzer-Filter über HTTP-GET Params
+-> Suchstring wird vorverarbeitet: Punktierungen entfernen, Normalisieren, Solr query modifikatoren anfügen (Wildcard & Fuzzy search)
+-> Erstellt eine SolrSearchQuery mit dem vorbereiteten Suchstring und den kombiniertem Filter des Nutzer und der Ergebnismoduleinstellungen
+-> Für jedes Ergebnis wird ein SolrDocument erzeugt, welches dieses einzelne Ergebnis rendert (Templates: bbit_solr_doc_*)
+-> Alle Ergebnisse werden in einer Liste ausgegeben (Template mod_bbit_solr_result)
+-> Besonderes Template zur Gruppierung der Ergebnisse: mod_bbit_solr_result_grouped
 
 Solr:
 - Befindet sich in "/opt/solr" (inkl. SharedLibs)
